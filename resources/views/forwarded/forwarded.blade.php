@@ -1,0 +1,422 @@
+@extends('layouts.app')
+
+@section('header')
+<div class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-6 py-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">
+                    Forwarded Documents
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('content')
+
+<!-- CENTER WRAPPER -->
+<div class="flex justify-center w-full py-6">
+
+    <!-- CARD -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-7xl">
+
+        <!-- Table Wrapper -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-gray-700 border-collapse">
+
+                <!-- Table Head -->
+                <thead class="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase text-xs tracking-wider">
+                    <tr>
+                        <th class="px-6 py-4 text-center">#</th>
+                        <th class="px-6 py-4 text-left">Document No.</th>
+                        <th class="px-6 py-4 text-center">Document Title</th>
+                        <th class="px-6 py-4 text-center">Sender Unit</th>
+                        <th class="px-6 py-4 text-center">Type</th>
+                        <th class="px-6 py-4 text-center">Forwarded To</th>
+                        <th class="px-6 py-4 text-center">Status</th>
+                        <th class="px-6 py-4 text-center">Forwarded At</th>
+                        <th class="px-6 py-4 text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <!-- Table Body -->
+                <tbody class="divide-y divide-gray-100">
+
+                    @forelse ($forwardHistories as $history)
+                        <tr class="hover:bg-gray-50 transition">
+
+                            <!-- # -->
+                            <td class="px-6 py-4 font-medium text-gray-800 text-center">
+                                {{ $loop->iteration }}
+                            </td>
+
+                            <!-- Document No. -->
+                            <td class="px-6 py-4 font-semibold text-gray-900 text-left">
+                                {{ $history->document->document_number }}
+                            </td>
+
+                            <!-- Document Title -->
+                            <td class="px-6 py-4 text-center">
+                                {{ $history->document->title }}
+                            </td>
+
+                            <!-- Sender Unit -->
+                            <td class="px-6 py-4 text-center">
+                                {{ $history->document->senderUnit->name ?? '-' }}
+                            </td>
+
+                            <!-- Type -->
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
+                                    {{ $history->document->document_type }}
+                                </span>
+                            </td>
+
+                            <!-- Forwarded To -->
+                            <td class="px-6 py-4 text-center">
+                                {{ $history->toUnit->name ?? '-' }}
+                            </td>
+
+                            <!-- Status -->
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                                      style="background-color: #f5f3ff; color: #6d28d9;">
+                                    Forwarded
+                                </span>
+                            </td>
+
+                            <!-- Forwarded At -->
+                            <td class="px-6 py-4 text-gray-600 text-center">
+                                {{ $history->created_at->format('M d, Y h:i A') }}
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 text-center">
+                                <a href="{{ route('documents.view', ['id' => $history->document->id]) }}"
+                                   class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 transition text-xs font-semibold">
+                                    Details
+                                </a>
+                            </td>
+
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="9" class="px-6 py-12 text-center text-gray-500">
+                                <div class="flex flex-col items-center gap-2">
+                                    <span class="text-lg">📄</span>
+                                    <span>No forwarded documents found</span>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- FLOATING UPLOAD BUTTON + MODAL -->
+<div x-data="{ 
+    open: false, 
+    documentNumber: '',
+    showSuccessUpload: false,
+    async openModal() {
+        this.open = true;
+        await this.fetchDocumentNumber();
+    },
+    async fetchDocumentNumber() {
+        try {
+            const response = await fetch('{{ route('documents.next-number') }}');
+            const data = await response.json();
+            this.documentNumber = data.document_number;
+        } catch (error) {
+            console.error('Error fetching document number:', error);
+        }
+    },
+    submitUpload(event) {
+        event.preventDefault();
+        this.open = false;
+        this.showSuccessUpload = true;
+        setTimeout(() => {
+            event.target.submit();
+        }, 1500);
+    }
+}">
+
+    <!-- FLOATING BUTTON -->
+    <button
+        @click="openModal()"
+        type="button"
+        style="
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            background-color: #0B1F3A;
+            color: #ffffff;
+            padding: 14px 22px;
+            border-radius: 9999px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+            font-weight: 600;
+        "
+    >
+        ＋ Document
+    </button>
+
+    <!-- MODAL BACKDROP + MODAL (CENTERED) -->
+    <div
+        x-show="open"
+        x-cloak
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        @click="open = false"
+        class="fixed inset-0 z-[10000] flex items-center justify-center p-4"
+        style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);"
+    >
+
+        <!-- MODAL CARD (PERFECTLY CENTERED - SQUARE) -->
+        <div
+            @click.stop
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-90"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-90"
+            class="bg-white rounded-5xl shadow-2xl overflow-y-auto"
+            style="width: 500px; max-height: 90vh; border-radius: 2rem;"
+        >
+
+            <!-- HEADER -->
+            <div class="flex items-center justify-between px-2 py-2 border-b bg-gradient-to-r from-gray-50 to-white">
+                <h2 class="text-l font-semibold text-gray-800 mb-0.5 px-4">
+                    Upload New Document
+                </h2>
+
+                <button
+                    @click="open = false"
+                    type="button"
+                    class="w-9 h-9 flex items-center justify-center rounded-full 
+                           hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition duration-200 mb-0.5 px-4"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- FORM -->
+            <form
+                action="{{ route('documents.store') }}"
+                method="POST"
+                enctype="multipart/form-data"
+                class="px-6 py-4 space-y-2.5"
+                @submit="submitUpload($event)"
+            >
+            @csrf
+
+            <!-- Document Number (Auto-generated, Read-only) -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Document Number <span class="text-red-500">*</span>
+                </label>
+                <input
+                    name="document_number"
+                    x-model="documentNumber"
+                    required
+                    readonly
+                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5
+                           bg-gray-50 text-gray-600 cursor-not-allowed
+                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                           outline-none text-sm transition duration-200"
+                    placeholder="Loading..."
+                >
+                <p class="text-xs text-gray-500 mt-1">Auto-generated document number</p>
+            </div>
+
+            <!-- Document Title -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Document Title <span class="text-red-500">*</span>
+                </label>
+                <input
+                    name="title"
+                    required
+                    placeholder="Enter descriptive title"
+                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5
+                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                           outline-none text-sm transition duration-200
+                           hover:border-gray-400"
+                >
+            </div>
+
+            <!-- Receiving Unit -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Receiving Unit <span class="text-red-500">*</span>
+                </label>
+                <select
+                    name="receiving_unit_id"
+                    required
+                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5
+                           bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                           outline-none text-sm transition duration-200
+                           hover:border-gray-400"
+                >
+                    <option value="">Select Receiving Unit</option>
+                    @foreach($units as $unit)
+                        @if($unit->id != auth()->user()->unit_id)
+                            <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                        @endif
+                    @endforeach
+                </select>
+                <p class="text-xs text-gray-500 mt-1">You cannot send to your own unit</p>
+            </div>
+
+            <!-- Document Type -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Document Type <span class="text-red-500">*</span>
+                </label>
+                <select
+                    name="document_type"
+                    required
+                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5
+                           bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                           outline-none text-sm transition duration-200
+                           hover:border-gray-400"
+                >
+                    <option value="">Select document type</option>
+                    <option>Birth Certificate</option>
+                    <option>Marriage Certificate</option>
+                    <option>Clearance</option>
+                    <option>Memorandum</option>
+                    <option>Letter</option>
+                    <option>Report</option>
+                    <option>Others</option>
+                </select>
+            </div>
+
+            <!-- File Upload -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Attach File <span class="text-red-500">*</span>
+                </label>
+
+                <div class="relative">
+                    <input
+                        type="file"
+                        name="file"
+                        required
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                        class="block w-full text-sm text-gray-600
+                               file:mr-4 file:rounded-lg file:border-0
+                               file:bg-blue-50 file:text-blue-700
+                               file:px-4 file:py-2 file:text-sm file:font-semibold
+                               hover:file:bg-blue-100 transition duration-200
+                               border border-gray-300 rounded-lg
+                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                               cursor-pointer"
+                    >
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Accepted: PDF, DOC, DOCX, JPG, PNG (Max: 25MB)</p>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="flex justify-end gap-3 pt-4 border-t">
+
+                <button
+                    type="button"
+                    @click="open = false"
+                    class="px-6 py-2.5 rounded-lg border-2 border-gray-300
+                           text-gray-700 hover:bg-gray-50 transition duration-200 
+                           font-semibold text-sm"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="px-6 py-2.5 rounded-lg text-white font-semibold text-sm
+                           shadow-lg hover:shadow-xl transition duration-200
+                           transform hover:-translate-y-0.5"
+                    style="background-color:#0B1F3A;"
+                >
+                    Upload
+                </button>
+
+            </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- SUCCESS UPLOAD MODAL -->
+    <div x-show="showSuccessUpload" 
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center" 
+         style="background-color: rgba(11, 31, 58, 0.6); backdrop-filter: blur(4px);"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100">
+        
+        <div class="rounded-3xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center" 
+             style="background-color: white;"
+             x-transition:enter="transition ease-out duration-300 delay-75"
+             x-transition:enter-start="opacity-0 scale-75"
+             x-transition:enter-end="opacity-100 scale-100">
+            
+            <!-- Animated checkmark -->
+            <div class="mb-6">
+                <div class="mx-auto w-20 h-20 rounded-full flex items-center justify-center shadow-lg animate-bounce-in" 
+                     style="background: linear-gradient(to bottom right, #60a5fa, #3b82f6);">
+                    <svg class="w-10 h-10" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Success message -->
+            <h3 class="text-2xl font-bold mb-2" style="color: #111827;">Uploaded!</h3>
+            <p class="text-sm" style="color: #6b7280;">
+                Document has been uploaded successfully
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Add this to your CSS or in a style tag -->
+<style>
+    [x-cloak] { 
+        display: none !important; 
+    }
+
+    @keyframes bounce-in {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .animate-bounce-in {
+        animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+</style>
+
+@endsection

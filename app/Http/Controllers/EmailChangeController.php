@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\EmailChangeVerification;
+use App\Notifications\EmailChangeVerification as EmailChangeVerificationNotification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+
+class EmailChangeController extends Controller
+{
+    /**
+     * Send email change verification
+     */
+    public function sendVerification(Request $request)
+    {
+        // Strict email validation with TLD check
+        $request->validate([
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                // Only accept common TLDs (this will reject .co and other uncommon TLDs)
+                'regex:/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|io|ai|app|dev|tech|info|ph|uk|us|ca|au|de|fr|it|es|nl|jp|cn|in|br|ru|kr|mx|id|tr|za|se|no|dk|fi|pl|be|at|ch|cz|gr|pt|nz|sg|hk|my|th|vn|pk|bd|ng|eg|sa|ae|il|cl|pe|ar|ve|ua|ro|hu|ie|sk|biz|me|tv|asia|mil|int)$/i',
+                'unique:users,email,' . $request->user()->id,
+            ],
+        ], [
+            'email.required' => 'Email address is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.regex' => 'Please enter a valid email address with a recognized domain extension (e.g., .com, .org, .net). The extension you provided is not supported.',
+            'email.unique' => 'This email address is already in use.',
+        ]);
+
+        // Delete any existing verification for this user
+        EmailChangeVerification::where('user_id', $request->user()->id)->delete();
+
+        // Create new verification token
+        $token = Str::random(64);
+        
+        EmailChangeVerification::create([
+            'user_id' => $request->user()->id,
+            'new_email' => $request->email,
+            'token' => $token,
+            'expires_at' => Carbon::now()->addMinutes(60),
+        ]);
+
+        // Send verification email to the NEW email address
+        $request->user()->notify(new EmailChangeVerificationNotification($token, $request->email));
+
+        return back()->with('status', 'verification-link-sent');
+    }
+
+    /**
+     * Verify the email change
+     */
+    public function verify(Request $request)
+    {
+        $verification = EmailChangeVerification::where('token', $request->token)
+            ->where('new_email', $request->email)
+            ->first();
+
+        if (!$verification) {
+            return redirect()->route('login')->with('error', 'Invalid verification link.');
+        }
+
+        if ($verification->isExpired()) {
+            $verification->delete();
+            return redirect()->route('login')->with('error', 'Verification link has expired.');
+        }
+
+        // Check if email is still unique
+        if (DB::table('users')->where('email', $verification->new_email)->exists()) {
+            $verification->delete();
+            return redirect()->route('login')->with('error', 'This email address is already in use.');
+        }
+
+        // Update user email
+        $user = $verification->user;
+        $user->email = $verification->new_email;
+        $user->email_verified_at = now();
+        $user->save();
+
+        // Delete verification record
+        $verification->delete();
+
+        // Log out the user from all devices
+        \Illuminate\Support\Facades\Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('status', 'email-updated-login');
+    }
+}
