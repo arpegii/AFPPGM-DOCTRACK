@@ -37,37 +37,18 @@ class DocumentForwardedNotification extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        if ($this->isOriginalSender) {
-            return (new MailMessage)
-                ->subject('Your Document is Being Forwarded - ' . $this->document->document_number)
-                ->greeting('Hello ' . $notifiable->name . '!')
-                ->line('Your document is being forwarded to another unit.')
-                ->line('**Document Number:** ' . $this->document->document_number)
-                ->line('**Title:** ' . $this->document->title)
-                ->line('**From Unit:** ' . $this->forwardHistory->fromUnit->name)
-                ->line('**To Unit:** ' . $this->forwardHistory->toUnit->name)
-                ->line('**Forwarded by:** ' . $this->forwardHistory->forwardedBy->name)
-                ->when($this->forwardHistory->notes, function ($mail) {
-                    return $mail->line('**Notes:** ' . $this->forwardHistory->notes);
-                })
-                ->action('Track Document', route('track.index'))
-                ->line('Your document is moving through the system.');
-        }
-
         return (new MailMessage)
-            ->subject('Document Forwarded to Your Unit - ' . $this->document->document_number)
-            ->greeting('Hello ' . $notifiable->name . '!')
-            ->line('A document has been forwarded to your unit.')
-            ->line('**Document Number:** ' . $this->document->document_number)
-            ->line('**Title:** ' . $this->document->title)
-            ->line('**From Unit:** ' . $this->forwardHistory->fromUnit->name)
-            ->line('**To Unit:** ' . $this->forwardHistory->toUnit->name)
-            ->line('**Forwarded by:** ' . $this->forwardHistory->forwardedBy->name)
-            ->when($this->forwardHistory->notes, function ($mail) {
-                return $mail->line('**Notes:** ' . $this->forwardHistory->notes);
-            })
-            ->action('View Document', route('documents.view', $this->document->id))
-            ->line('Please review this document at your earliest convenience.');
+            ->subject(
+                $this->isOriginalSender 
+                    ? 'Your Document is Being Forwarded - ' . $this->document->document_number
+                    : 'Document Forwarded to Your Unit - ' . $this->document->document_number
+            )
+            ->view('emails.document-forwarded', [
+                'document' => $this->document,
+                'user' => $notifiable,
+                'forwardHistory' => $this->forwardHistory,
+                'isOriginalSender' => $this->isOriginalSender
+            ]);
     }
 
     /**

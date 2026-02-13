@@ -36,15 +36,11 @@ class DocumentRejectedNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Document Rejected - ' . $this->document->document_number)
-            ->greeting('Hello ' . $notifiable->name . '!')
-            ->line('Your document has been rejected.')
-            ->line('**Document Number:** ' . $this->document->document_number)
-            ->line('**Title:** ' . $this->document->title)
-            ->line('**Rejected by:** ' . $this->rejectedBy->name)
-            ->line('**Reason:** ' . ($this->document->rejection_reason ?: 'No reason provided'))
-            ->line('**Date:** ' . $this->document->rejected_at->format('F j, Y g:i A'))
-            ->action('View Document', route('documents.view', $this->document->id))
-            ->line('Please review and take necessary action.');
+            ->view('emails.document-rejected', [
+                'document' => $this->document,
+                'user' => $notifiable,
+                'rejectedBy' => $this->rejectedBy
+            ]);
     }
 
     /**

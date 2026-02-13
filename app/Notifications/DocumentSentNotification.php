@@ -34,15 +34,10 @@ class DocumentSentNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('New Document Received - ' . $this->document->document_number)
-            ->greeting('Hello ' . $notifiable->name . '!')
-            ->line('A new document has been sent to your unit.')
-            ->line('**Document Number:** ' . $this->document->document_number)
-            ->line('**Title:** ' . $this->document->title)
-            ->line('**Type:** ' . $this->document->document_type)
-            ->line('**From:** ' . ($this->document->senderUnit->name ?? 'Unknown Unit'))
-            ->line('**Sent by:** ' . ($this->document->creator->name ?? 'System'))
-            ->action('View Document', route('documents.view', $this->document->id))
-            ->line('Please review this document at your earliest convenience.');
+            ->view('emails.document-sent', [
+                'document' => $this->document,
+                'user' => $notifiable
+            ]);
     }
 
     /**

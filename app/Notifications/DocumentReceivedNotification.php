@@ -36,16 +36,11 @@ class DocumentReceivedNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Document Received by Receiver Unit - ' . $this->document->document_number)
-            ->greeting('Hello ' . $notifiable->name . '!')
-            ->line('Your document has been marked as received.')
-            ->line('**Document Number:** ' . $this->document->document_number)
-            ->line('**Title:** ' . $this->document->title)
-                        ->line('**From:** ' . ($this->document->senderUnit->name ?? 'Unknown Unit'))
-
-            ->line('**Received by:** ' . $this->receivedBy->name)
-            ->line('**Date:** ' . $this->document->received_at->format('F j, Y g:i A'))
-            ->action('View Document', route('documents.view', $this->document->id))
-            ->line('Thank you for using our document tracking system!');
+            ->view('emails.document-received', [
+                'document' => $this->document,
+                'user' => $notifiable,
+                'receivedBy' => $this->receivedBy
+            ]);
     }
 
     /**

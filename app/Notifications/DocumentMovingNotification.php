@@ -37,18 +37,11 @@ class DocumentMovingNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Document Update: Your Document is Moving - ' . $this->document->document_number)
-            ->greeting('Hello ' . $notifiable->name . '!')
-            ->line('Your document is being processed and has been forwarded to another unit.')
-            ->line('**Document Number:** ' . $this->document->document_number)
-            ->line('**Title:** ' . $this->document->title)
-            ->line('**Current Location:** ' . $this->forwardHistory->fromUnit->name)
-            ->line('**Forwarded to:** ' . $this->forwardHistory->toUnit->name)
-            ->line('**Forwarded by:** ' . $this->forwardHistory->forwardedBy->name)
-            ->when($this->forwardHistory->notes, function ($mail) {
-                return $mail->line('**Notes:** ' . $this->forwardHistory->notes);
-            })
-            ->action('Track Your Document', route('track.index'))
-            ->line('Your document is moving through the workflow. You will be notified of any updates.');
+            ->view('emails.document-moving', [
+                'notifiable' => $notifiable,
+                'document' => $this->document,
+                'forwardHistory' => $this->forwardHistory,
+            ]);
     }
 
     /**
