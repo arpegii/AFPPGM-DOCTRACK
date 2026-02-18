@@ -10,31 +10,58 @@ use Illuminate\Support\Facades\Auth;
 class OutgoingController extends Controller
 {
     /**
-     * Display outgoing documents (sent by user's unit)
-     * Shows all statuses: incoming, received, rejected, forwarded
-     * Includes both originally sent documents and forwarded documents
+     * Display outgoing pending documents sent by user's unit.
      */
-public function index()
-{
-    $user = Auth::user();
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $selectedUnitId = null;
+        $filterUnits = $user->isAdmin() ? Unit::all() : collect();
 
-    // Get units visible to the current user (excludes ADMN for non-admins)
-    $units = Unit::visibleToUser($user);
+        if ($user->isAdmin()) {
+            if ($request->has('unit_id')) {
+                $selectedUnitId = $request->input('unit_id');
 
-    if ($user->isAdmin()) {
-        // Admin sees all documents
-        $documents = Document::with(['senderUnit', 'receivingUnit'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-    } else {
-        // Users see only documents sent by their unit
-        $documents = Document::with(['senderUnit', 'receivingUnit'])
-            ->where('sender_unit_id', $user->unit_id)
-            ->whereIn('status', ['incoming', 'received', 'rejected', 'forwarded'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+                if ($selectedUnitId) {
+                    $request->session()->put('admin_unit_filter_id', $selectedUnitId);
+                } else {
+                    $request->session()->forget('admin_unit_filter_id');
+                }
+            } else {
+                $selectedUnitId = $request->session()->get('admin_unit_filter_id');
+            }
+        }
+
+        // Get units visible to the current user (excludes ADMN for non-admins)
+        $units = Unit::visibleToUser($user);
+
+        if ($user->isAdmin()) {
+            // Admin sees all pending outgoing documents.
+            $query = Document::with(['senderUnit', 'receivingUnit'])
+                ->where('status', 'incoming');
+
+            if ($selectedUnitId) {
+                $query->where(function ($subQuery) use ($selectedUnitId) {
+                    $subQuery->where('sender_unit_id', $selectedUnitId)
+                        ->orWhere('receiving_unit_id', $selectedUnitId);
+                });
+            }
+
+            $documents = $query->orderBy('created_at', 'desc')->get();
+        } else {
+            // Users see pending documents sent by their unit.
+            $documents = Document::with(['senderUnit', 'receivingUnit'])
+                ->where('sender_unit_id', $user->unit_id)
+                ->where('status', 'incoming')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        return view('outgoing.outgoing', compact(
+            'documents',
+            'units',
+            'filterUnits',
+            'selectedUnitId'
+        ));
     }
-
-    return view('outgoing.outgoing', compact('documents', 'units'));
-}
 }

@@ -57,9 +57,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     */
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+    Route::post('/notifications/selected/read', [NotificationController::class, 'markSelectedAsRead'])->name('notifications.read-selected');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::post('/notifications/selected/delete', [NotificationController::class, 'destroySelected'])->name('notifications.destroy-selected');
 
     /*
     |--------------------------------------------------------------------------

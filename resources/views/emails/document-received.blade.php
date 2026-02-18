@@ -21,8 +21,6 @@
         .detail-row:last-child { border-bottom: none; }
         .detail-label { display: table-cell; font-weight: 600; color: #374151; width: 140px; padding-right: 15px; vertical-align: top; }
         .detail-value { display: table-cell; color: #555555; vertical-align: top; }
-        .cta-container { text-align: center; margin: 30px 0; }
-        .cta-button { display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
         .success-badge { display: inline-block; background-color: #d1fae5; color: #059669; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
         .email-footer { background-color: #f8f9fc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; }
         .email-footer p { margin: 8px 0; font-size: 13px; color: #6b7280; line-height: 1.5; }
@@ -80,13 +78,6 @@
                         <div class="detail-label">Date & Time:</div>
                         <div class="detail-value">{{ $document->received_at->format('F j, Y g:i A') }}</div>
                     </div>
-                </div>
-
-                <!-- Call to Action Button -->
-                <div class="cta-container">
-                    <a href="{{ route('documents.view', $document->id) }}" class="cta-button">
-                        View Document Details
-                    </a>
                 </div>
 
                 <!-- Signature -->

@@ -16,6 +16,33 @@
 
 @section('content')
 
+@if(auth()->user()->isAdmin())
+    <div class="max-w-7xl mx-auto px-6 pb-2">
+        <form method="GET" action="{{ route('rejected.index') }}" class="bg-white border border-gray-200 rounded-xl p-4">
+            <div class="flex flex-col md:flex-row md:items-center gap-3">
+                <div class="md:flex-1">
+                    <select name="unit_id" class="w-full rounded-lg border-gray-300 text-sm">
+                        <option value="">All units</option>
+                        @foreach($filterUnits as $unit)
+                            <option value="{{ $unit->id }}" {{ (string) $selectedUnitId === (string) $unit->id ? 'selected' : '' }}>
+                                {{ $unit->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex gap-2 md:justify-end md:ml-auto">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition">
+                        Apply
+                    </button>
+                    <a href="{{ route('rejected.index', ['unit_id' => '']) }}" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition">
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+@endif
+
 <!-- CENTER WRAPPER -->
 <div class="flex justify-center w-full py-6">
 

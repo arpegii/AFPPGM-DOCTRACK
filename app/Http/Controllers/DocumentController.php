@@ -397,27 +397,66 @@ class DocumentController extends Controller
     }
 
     /**
-     * Show all documents forwarded by the current user
+     * Show forwarded documents sent by the current user's unit.
      */
-    public function forwarded()
+    public function forwarded(Request $request)
     {
         /** @var User $user */
         $user = Auth::user();
+        $selectedUnitId = null;
+        $filterUnits = $user->isAdmin() ? Unit::all() : collect();
 
-        $forwardHistories = DocumentForwardHistory::with([
+        if ($user->isAdmin()) {
+            if ($request->has('unit_id')) {
+                $selectedUnitId = $request->input('unit_id');
+
+                if ($selectedUnitId) {
+                    $request->session()->put('admin_unit_filter_id', $selectedUnitId);
+                } else {
+                    $request->session()->forget('admin_unit_filter_id');
+                }
+            } else {
+                $selectedUnitId = $request->session()->get('admin_unit_filter_id');
+            }
+        }
+
+        $forwardHistoriesQuery = DocumentForwardHistory::with([
             'document.senderUnit',
             'document.receivingUnit',
             'document.creator',
             'fromUnit',
             'toUnit',
             'forwardedBy'
-        ])
-        ->where('forwarded_by_user_id', $user->id)
-        ->orderBy('created_at', 'desc')
-        ->get();
+        ])->whereHas('document', function ($query) use ($user) {
+            if (!$user->isAdmin()) {
+                $query->where('sender_unit_id', $user->unit_id);
+            }
+
+            // "Forwarded" is represented by having forwarding activity.
+            $query->whereNotNull('forwarded_at');
+        });
+
+        if ($user->isAdmin() && $selectedUnitId) {
+            $forwardHistoriesQuery->where(function ($query) use ($selectedUnitId) {
+                $query->whereHas('document', function ($docQuery) use ($selectedUnitId) {
+                    $docQuery->where('sender_unit_id', $selectedUnitId)
+                        ->orWhere('receiving_unit_id', $selectedUnitId);
+                })->orWhere('from_unit_id', $selectedUnitId)
+                  ->orWhere('to_unit_id', $selectedUnitId);
+            });
+        }
+
+        $forwardHistories = $forwardHistoriesQuery
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $units = Unit::all();
 
-        return view('forwarded.forwarded', compact('forwardHistories', 'units'));
+        return view('forwarded.forwarded', compact(
+            'forwardHistories',
+            'units',
+            'filterUnits',
+            'selectedUnitId'
+        ));
     }
 }

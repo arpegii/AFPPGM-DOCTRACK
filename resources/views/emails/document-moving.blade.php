@@ -28,8 +28,6 @@
         .notes-box { background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 15px; margin: 20px 0; }
         .notes-box strong { color: #92400e; display: block; margin-bottom: 8px; font-size: 14px; }
         .notes-box p { color: #78350f; margin: 0; font-size: 14px; line-height: 1.6; font-style: italic; }
-        .cta-container { text-align: center; margin: 30px 0; }
-        .cta-button { display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%); color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3); }
         .info-box { background-color: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center; }
         .info-box p { color: #581c87; margin: 0; font-size: 14px; line-height: 1.6; }
         .email-footer { background-color: #f8f9fc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; }
@@ -112,13 +110,6 @@
                 <!-- Info Box -->
                 <div class="info-box">
                     <p>Your document is moving through the workflow. You will be notified of any updates.</p>
-                </div>
-
-                <!-- Call to Action Button -->
-                <div class="cta-container">
-                    <a href="{{ route('track.index') }}" class="cta-button">
-                        Track Your Document
-                    </a>
                 </div>
 
                 <!-- Signature -->

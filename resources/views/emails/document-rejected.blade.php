@@ -24,8 +24,6 @@
         .rejection-reason { background-color: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px; margin: 20px 0; }
         .rejection-reason strong { color: #dc2626; display: block; margin-bottom: 8px; font-size: 14px; }
         .rejection-reason p { color: #991b1b; margin: 0; font-size: 14px; line-height: 1.6; }
-        .cta-container { text-align: center; margin: 30px 0; }
-        .cta-button { display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
         .warning-badge { display: inline-block; background-color: #fee2e2; color: #dc2626; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
         .email-footer { background-color: #f8f9fc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; }
         .email-footer p { margin: 8px 0; font-size: 13px; color: #6b7280; line-height: 1.5; }
@@ -85,13 +83,6 @@
                 <div class="rejection-reason">
                     <strong>📋 Rejection Reason:</strong>
                     <p>{{ $document->rejection_reason ?: 'No reason provided' }}</p>
-                </div>
-
-                <!-- Call to Action Button -->
-                <div class="cta-container">
-                    <a href="{{ route('documents.view', $document->id) }}" class="cta-button">
-                        View Document Details
-                    </a>
                 </div>
 
                 <div class="message">

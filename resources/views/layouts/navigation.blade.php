@@ -138,6 +138,11 @@
                                 $iconColor = 'text-white';
                                 $bgColor = 'bg-orange-500';
                                 break;
+                            case 'document_overdue':
+                                $iconClass = 'fa-exclamation-triangle';
+                                $iconColor = 'text-white';
+                                $bgColor = 'bg-red-500';
+                                break;
                         }
                     }
                 @endphp
@@ -159,6 +164,20 @@
                         {{ $notification->created_at->diffForHumans() }}
                     </p>
                 </div>
+
+                <form action="{{ route('notifications.read', $notification->id) }}" method="POST" class="flex-shrink-0 self-center">
+                    @csrf
+                    <input type="hidden" name="stay" value="1">
+                    <button
+                        type="submit"
+                        class="inline-flex items-center justify-center w-5 h-5 text-blue-600 border border-blue-500 hover:bg-blue-50 rounded-full transition-all duration-200"
+                        title="Mark as read"
+                    >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </button>
+                </form>
             </div>
         </div>
     @empty

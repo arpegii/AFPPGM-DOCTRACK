@@ -27,8 +27,6 @@
         .notes-box { background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 15px; margin: 20px 0; }
         .notes-box strong { color: #92400e; display: block; margin-bottom: 8px; font-size: 14px; }
         .notes-box p { color: #78350f; margin: 0; font-size: 14px; line-height: 1.6; font-style: italic; }
-        .cta-container { text-align: center; margin: 30px 0; }
-        .cta-button { display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #eab308 0%, #fbbf24 100%); color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3); }
         .info-badge { display: inline-block; background-color: #fef3c7; color: #eab308; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
         .email-footer { background-color: #f8f9fc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; }
         .email-footer p { margin: 8px 0; font-size: 13px; color: #6b7280; line-height: 1.5; }
@@ -112,19 +110,6 @@
                         <p>{{ $forwardHistory->notes }}</p>
                     </div>
                 @endif
-
-                <!-- Call to Action Button -->
-                <div class="cta-container">
-                    @if($isOriginalSender)
-                        <a href="{{ route('track.index') }}" class="cta-button">
-                            Track Document
-                        </a>
-                    @else
-                        <a href="{{ route('documents.view', $document->id) }}" class="cta-button">
-                            View Document
-                        </a>
-                    @endif
-                </div>
 
                 @if(!$isOriginalSender)
                     <div class="message">

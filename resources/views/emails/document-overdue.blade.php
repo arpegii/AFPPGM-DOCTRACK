@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Document Received</title>
+    <title>Overdue Document Alert</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7fa; color: #333333; line-height: 1.6; }
         .email-wrapper { width: 100%; background-color: #f4f7fa; padding: 40px 20px; }
         .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
-        .email-header { background: linear-gradient(135deg, #0B1F3A 0%, #1a3a5c 100%); padding: 40px 30px; text-align: center; color: #ffffff; }
-        .email-header img { max-width: 80px; margin-bottom: 20px; }
+        .email-header { background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%); padding: 40px 30px; text-align: center; color: #ffffff; }
         .email-header h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
         .email-header p { margin: 10px 0 0 0; font-size: 14px; opacity: 0.9; }
         .email-body { padding: 40px 30px; }
-        .greeting { font-size: 18px; font-weight: 600; color: #0B1F3A; margin-bottom: 20px; }
+        .greeting { font-size: 18px; font-weight: 600; color: #b91c1c; margin-bottom: 20px; }
         .message { font-size: 15px; line-height: 1.8; color: #555555; margin-bottom: 25px; }
-        .document-details { background-color: #f8f9fc; border-left: 4px solid #0B1F3A; padding: 20px; border-radius: 8px; margin: 25px 0; }
-        .detail-row { display: table; width: 100%; padding: 10px 0; border-bottom: 1px solid #e5e7eb; }
+        .warning-box { background-color: #fef2f2; border-left: 4px solid #dc2626; padding: 15px; border-radius: 8px; margin: 20px 0; color: #991b1b; font-size: 14px; font-weight: 600; }
+        .document-details { background-color: #fef2f2; border-left: 4px solid #dc2626; padding: 20px; border-radius: 8px; margin: 25px 0; }
+        .detail-row { display: table; width: 100%; padding: 10px 0; border-bottom: 1px solid #fecaca; }
         .detail-row:last-child { border-bottom: none; }
         .detail-label { display: table-cell; font-weight: 600; color: #374151; width: 140px; padding-right: 15px; vertical-align: top; }
         .detail-value { display: table-cell; color: #555555; vertical-align: top; }
@@ -37,21 +37,22 @@
 <body>
     <div class="email-wrapper">
         <div class="email-container">
-            <!-- Header -->
             <div class="email-header">
-                <h1>New Document Received</h1>
+                <h1>Overdue Document Alert</h1>
                 <p>Document Tracking System</p>
             </div>
 
-            <!-- Body -->
             <div class="email-body">
                 <div class="greeting">Hello {{ $user->name }}!</div>
-                
+
                 <div class="message">
-                    A new document has been sent to your unit and requires your attention.
+                    An incoming document in your unit has been pending for {{ $pendingDays }} days and is now overdue.
                 </div>
 
-                <!-- Document Details Card -->
+                <div class="warning-box">
+                    Action required: This document is overdue by {{ $overdueDays }} day{{ $overdueDays === 1 ? '' : 's' }} beyond the 3-day limit.
+                </div>
+
                 <div class="document-details">
                     <div class="detail-row">
                         <div class="detail-label">Document No:</div>
@@ -70,23 +71,25 @@
                         <div class="detail-value">{{ $document->senderUnit->name ?? 'Unknown Unit' }}</div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Sent by:</div>
-                        <div class="detail-value">{{ $document->creator->name ?? 'System' }}</div>
+                        <div class="detail-label">To Unit:</div>
+                        <div class="detail-value">{{ $document->receivingUnit->name ?? 'Unknown Unit' }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Pending Days:</div>
+                        <div class="detail-value">{{ $pendingDays }} day{{ $pendingDays === 1 ? '' : 's' }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Overdue By:</div>
+                        <div class="detail-value">{{ $overdueDays }} day{{ $overdueDays === 1 ? '' : 's' }}</div>
                     </div>
                 </div>
 
-                <div class="message">
-                    Please review this document at your earliest convenience.
-                </div>
-
-                <!-- Signature -->
                 <div class="signature">
                     <p style="margin: 0; color: #374151;">Regards,</p>
-                    <p style="margin: 5px 0 0 0; color: #0B1F3A; font-weight: 600;">Document Tracking System</p>
+                    <p style="margin: 5px 0 0 0; color: #b91c1c; font-weight: 600;">Document Tracking System</p>
                 </div>
             </div>
 
-            <!-- Footer -->
             <div class="email-footer">
                 <p>This is an automated notification from the Document Tracking System.</p>
                 <p>Please do not reply to this email.</p>

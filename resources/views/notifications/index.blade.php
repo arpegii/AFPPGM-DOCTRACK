@@ -3,7 +3,83 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
     <div class="container mx-auto px-4">
-        <div class="max-w-5xl mx-auto">
+        <div
+            class="max-w-5xl mx-auto"
+            x-data="{
+                selectedNotifications: [],
+                pageNotificationIds: @js($notifications->pluck('id')->values()),
+                totalNotifications: {{ $notifications->total() }},
+                selectAllAcrossPages: false,
+                showConfirmModal: false,
+                showSingleDeleteModal: false,
+                pendingAction: '',
+                singleDeleteAction: '',
+                get hasSelection() {
+                    return this.selectAllAcrossPages || this.selectedNotifications.length > 0;
+                },
+                get selectedCount() {
+                    return this.selectAllAcrossPages ? this.totalNotifications : this.selectedNotifications.length;
+                },
+                get isAllSelected() {
+                    return this.selectAllAcrossPages;
+                },
+                toggleSelectAll(event) {
+                    if (event.target.checked) {
+                        this.selectAllAcrossPages = true;
+                        this.selectedNotifications = [...this.pageNotificationIds];
+                        return;
+                    }
+
+                    this.selectAllAcrossPages = false;
+                    this.selectedNotifications = [];
+                },
+                isNotificationSelected(id) {
+                    return this.selectAllAcrossPages || this.selectedNotifications.includes(id);
+                },
+                toggleNotification(id, checked) {
+                    if (this.selectAllAcrossPages) {
+                        this.selectAllAcrossPages = false;
+                        this.selectedNotifications = [...this.pageNotificationIds];
+                    }
+
+                    if (checked && !this.selectedNotifications.includes(id)) {
+                        this.selectedNotifications.push(id);
+                    }
+
+                    if (!checked) {
+                        this.selectedNotifications = this.selectedNotifications.filter((item) => item !== id);
+                    }
+                },
+                openConfirmModal(action) {
+                    if (!this.hasSelection) return;
+                    this.pendingAction = action;
+                    this.showConfirmModal = true;
+                },
+                closeConfirmModal() {
+                    this.showConfirmModal = false;
+                    this.pendingAction = '';
+                },
+                openSingleDeleteModal(notificationId) {
+                    this.singleDeleteAction = `{{ route('notifications.destroy', ['id' => '__ID__']) }}`.replace('__ID__', notificationId);
+                    this.showSingleDeleteModal = true;
+                },
+                closeSingleDeleteModal() {
+                    this.showSingleDeleteModal = false;
+                    this.singleDeleteAction = '';
+                }
+            }"
+        >
+            @if(session('success'))
+                <div class="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
+                    {{ $errors->first() }}
+                </div>
+            @endif
             
             <!-- Modern Header with Gradient -->
             <div class="mb-8">
@@ -71,12 +147,65 @@
                 </div>
             </div>
 
+            <!-- Bulk Select Actions -->
+            @if($notifications->count() > 0)
+                <div class="mb-5 bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <label class="inline-flex items-center gap-3 text-sm font-medium text-gray-700">
+                            <input
+                                type="checkbox"
+                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                :checked="isAllSelected"
+                                @change="toggleSelectAll($event)"
+                            >
+                            <span>Select All (all pages)</span>
+                        </label>
+
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500 mr-1" x-text="`${selectedCount} selected`"></span>
+                            <button
+                                type="button"
+                                @click="openConfirmModal('read')"
+                                :disabled="!hasSelection"
+                                class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border transition-all duration-200"
+                                :class="hasSelection
+                                    ? 'text-blue-700 bg-blue-50 hover:bg-blue-100 border-blue-200'
+                                    : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed'"
+                            >
+                                Mark selected as read
+                            </button>
+                            <button
+                                type="button"
+                                @click="openConfirmModal('delete')"
+                                :disabled="!hasSelection"
+                                class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border transition-all duration-200"
+                                :class="hasSelection
+                                    ? 'text-red-700 bg-red-50 hover:bg-red-100 border-red-200'
+                                    : 'text-gray-400 bg-gray-50 border-gray-200 cursor-not-allowed'"
+                            >
+                                Delete selected
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Notifications List -->
             <div class="space-y-3">
                 @forelse($notifications as $notification)
                     <div class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-200 {{ is_null($notification->read_at) ? 'ring-2 ring-blue-500/20' : '' }}">
                         <div class="p-5">
                             <div class="flex items-start gap-4">
+                                <div class="pt-1">
+                                    <input
+                                        type="checkbox"
+                                        value="{{ $notification->id }}"
+                                        :checked="isNotificationSelected('{{ $notification->id }}')"
+                                        @change="toggleNotification('{{ $notification->id }}', $event.target.checked)"
+                                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    >
+                                </div>
+
                                 <!-- Notification Icon with Animation -->
                                 @php
                                     $iconClass = 'fa-file';
@@ -115,6 +244,12 @@
                                                 $iconColor = 'text-purple-600';
                                                 $bgColor = 'bg-purple-100';
                                                 $ringColor = 'ring-purple-500/20';
+                                                break;
+                                            case 'document_overdue':
+                                                $iconClass = 'fa-exclamation-triangle';
+                                                $iconColor = 'text-red-600';
+                                                $bgColor = 'bg-red-100';
+                                                $ringColor = 'ring-red-500/20';
                                                 break;
                                         }
                                     }
@@ -191,18 +326,32 @@
                                             </div>
                                         </div>
                                         
-                                        <!-- Delete Button -->
-                                        <form action="{{ route('notifications.destroy', $notification->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" 
-                                                    class="inline-flex items-center justify-center w-9 h-9 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group/delete"
-                                                    onclick="return confirm('Are you sure you want to delete this notification?')">
+                                        <div class="flex items-center gap-2">
+                                            @if(is_null($notification->read_at))
+                                                <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="stay" value="1">
+                                                    <button type="submit"
+                                                            class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-all duration-200">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75" />
+                                                        </svg>
+                                                        Mark as read
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            <!-- Delete Button -->
+                                            <button
+                                                type="button"
+                                                @click="openSingleDeleteModal('{{ $notification->id }}')"
+                                                class="inline-flex items-center justify-center w-9 h-9 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group/delete"
+                                            >
                                                 <svg class="w-4 h-4 group-hover/delete:scale-110 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                             </button>
-                                        </form>
+                                        </div>
                                     </div>
                                     
                                     <!-- Rejection Reason Card -->
@@ -314,6 +463,93 @@
                         </div>
                     </div>
                 @endforelse
+            </div>
+
+            <!-- Single Delete Confirmation Modal -->
+            <div
+                x-cloak
+                x-show="showSingleDeleteModal"
+                class="fixed inset-0 z-50 flex items-center justify-center px-4"
+                style="display: none;"
+            >
+                <div class="absolute inset-0 bg-black/50" @click="closeSingleDeleteModal()"></div>
+
+                <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl border border-gray-100 p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Confirm Delete</h3>
+                    <p class="text-sm text-gray-600 mb-6">
+                        Are you sure you want to delete this notification?
+                    </p>
+
+                    <form method="POST" :action="singleDeleteAction">
+                        @csrf
+                        @method('DELETE')
+
+                        <div class="flex items-center justify-end gap-2">
+                            <button
+                                type="button"
+                                @click="closeSingleDeleteModal()"
+                                class="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                class="px-4 py-2 text-sm font-semibold text-white rounded-lg transition-all duration-200 bg-red-600 hover:bg-red-700"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Confirmation Modal -->
+            <div
+                x-cloak
+                x-show="showConfirmModal"
+                class="fixed inset-0 z-50 flex items-center justify-center px-4"
+                style="display: none;"
+            >
+                <div class="absolute inset-0 bg-black/50" @click="closeConfirmModal()"></div>
+
+                <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl border border-gray-100 p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2" x-text="pendingAction === 'delete' ? 'Confirm Delete' : 'Confirm Mark as Read'"></h3>
+                    <p class="text-sm text-gray-600 mb-6" x-text="pendingAction === 'delete'
+                        ? `Are you sure you want to delete ${selectedCount} selected notification(s)?`
+                        : `Are you sure you want to mark ${selectedCount} selected notification(s) as read?`">
+                    </p>
+
+                    <form method="POST" :action="pendingAction === 'delete' ? '{{ route('notifications.destroy-selected') }}' : '{{ route('notifications.read-selected') }}'">
+                        @csrf
+
+                        <template x-if="selectAllAcrossPages">
+                            <input type="hidden" name="apply_to_all" value="1">
+                        </template>
+
+                        <template x-if="!selectAllAcrossPages">
+                            <template x-for="notificationId in selectedNotifications" :key="notificationId">
+                                <input type="hidden" name="notification_ids[]" :value="notificationId">
+                            </template>
+                        </template>
+
+                        <div class="flex items-center justify-end gap-2">
+                            <button
+                                type="button"
+                                @click="closeConfirmModal()"
+                                class="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                class="px-4 py-2 text-sm font-semibold text-white rounded-lg transition-all duration-200"
+                                :class="pendingAction === 'delete' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'"
+                            >
+                                <span x-text="pendingAction === 'delete' ? 'Delete' : 'Mark as Read'"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <!-- Pagination -->
