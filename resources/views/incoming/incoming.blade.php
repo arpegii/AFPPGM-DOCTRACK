@@ -2,15 +2,10 @@
 
 @section('header')
 
-<div class="bg-white border-b">
-    <div class="max-w-7xl mx-auto px-6 py-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-semibold text-gray-900">
-                    Incoming Documents
-                </h1>
-            </div>
-        </div>
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Incoming Documents</h1>
+        <p class="page-subtitle">Review newly received files and take action quickly</p>
     </div>
 </div>
 
@@ -20,8 +15,8 @@
 
 <!-- Error Messages -->
 @if ($errors->any())
-    <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+    <div class="py-4">
+        <div class="panel-surface-soft border-red-200 bg-red-50 text-red-800 px-4 py-3 rounded-lg">
             <ul class="list-disc list-inside">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -32,11 +27,11 @@
 @endif
 
 @if(auth()->user()->isAdmin())
-    <div class="max-w-7xl mx-auto px-6 pb-2">
-        <form method="GET" action="{{ route('incoming.index') }}" class="bg-white border border-gray-200 rounded-xl p-4">
+    <div class="pb-2">
+        <form method="GET" action="{{ route('incoming.index') }}" class="filter-card">
             <div class="flex flex-col md:flex-row md:items-center gap-3">
                 <div class="md:flex-1">
-                    <select name="unit_id" class="w-full rounded-lg border-gray-300 text-sm">
+                    <select name="unit_id" class="form-select-modern">
                         <option value="">All units</option>
                         @foreach($filterUnits as $unit)
                             <option value="{{ $unit->id }}" {{ (string) $selectedUnitId === (string) $unit->id ? 'selected' : '' }}>
@@ -46,10 +41,10 @@
                     </select>
                 </div>
                 <div class="flex gap-2 md:justify-end md:ml-auto">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition">
+                    <button type="submit" class="btn-primary-modern">
                         Apply
                     </button>
-                    <a href="{{ route('incoming.index', ['unit_id' => '']) }}" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition">
+                    <a href="{{ route('incoming.index', ['unit_id' => '']) }}" class="btn-secondary-modern">
                         Reset
                     </a>
                 </div>
@@ -59,27 +54,23 @@
 @endif
 
 <!-- CENTER WRAPPER -->
-<div class="flex justify-center w-full py-6">
-
-    <!-- CARD -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-7xl">
-
-        <!-- Table Wrapper -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-gray-700 border-collapse">
+<div class="py-6">
+    <div class="table-shell">
+        <div class="overflow-x-auto modern-scrollbar">
+            <table class="table-modern">
 
                 <!-- Table Head -->
-                <thead class="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase text-xs tracking-wider">
+                <thead class="table-head border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-4 text-left">#</th>
-                        <th class="px-6 py-4 text-left">Document No.</th>
-                        <th class="px-6 py-4 text-center">Document Title</th>
-                        <th class="px-6 py-4 text-center">Sender Unit</th>
-                        <th class="px-6 py-4 text-center">Type</th>
-                        <th class="px-6 py-4 text-center">Receiving Unit</th>
-                        <th class="px-6 py-4 text-center">Status</th>
-                        <th class="px-6 py-4 text-center">Date</th>
-                        <th class="px-6 py-4 text-center">Actions</th>
+                        <th class="table-head-cell text-left">#</th>
+                        <th class="table-head-cell text-left">Document No.</th>
+                        <th class="table-head-cell text-center">Document Title</th>
+                        <th class="table-head-cell text-center">Sender Unit</th>
+                        <th class="table-head-cell text-center">Type</th>
+                        <th class="table-head-cell text-center">Receiving Unit</th>
+                        <th class="table-head-cell text-center">Status</th>
+                        <th class="table-head-cell text-center">Date</th>
+                        <th class="table-head-cell text-center">Actions</th>
                     </tr>
                 </thead>
 
@@ -130,82 +121,82 @@
                     }
                 }">
                     @forelse ($documents as $document)
-                    <tr class="hover:bg-gray-50 transition border-b border-gray-100">
+                    <tr class="table-row">
 
-                        <td class="px-6 py-4 font-medium text-gray-800 text-left">
+                        <td class="table-cell font-medium text-slate-700 text-left">
                             {{ $loop->iteration }}
                         </td>
 
-                        <td class="px-6 py-4 font-semibold text-gray-900 text-left">
+                        <td class="table-cell font-semibold text-slate-900 text-left">
                             {{ $document->document_number }}
                         </td>
 
                         <!-- Title -->
-                        <td class="px-6 py-4 text-center">
+                        <td class="table-cell text-center">
                             {{ $document->title }}
                         </td>
 
                         <!-- Sender Unit -->
-                        <td class="px-6 py-4 text-center">
+                        <td class="table-cell text-center">
                             {{ $document->senderUnit->name ?? '-' }}
                         </td>
 
                         <!-- Type -->
-                        <td class="px-6 py-4 text-center">
-                            <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
+                        <td class="table-cell text-center">
+                            <span class="badge-chip bg-blue-50 text-blue-700">
                                 {{ $document->document_type }}
                             </span>
                         </td>
 
                         <!-- Receiving Unit -->
-                        <td class="px-6 py-4 text-center">
+                        <td class="table-cell text-center">
                             {{ $document->receivingUnit->name ?? '-' }}
                         </td>
 
                         <!-- Status -->
-                        <td class="px-6 py-4 text-center">
+                        <td class="table-cell text-center">
                             @if($document->status == 'incoming')
-                                <span class="px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-semibold">
+                                <span class="badge-chip bg-amber-50 text-amber-700">
                                     Pending
                                 </span>
                             @elseif($document->status == 'received')
-                                <span class="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold">
+                                <span class="badge-chip bg-emerald-50 text-emerald-700">
                                     Received
                                 </span>
                             @elseif($document->status == 'rejected')
-                                <span class="px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-semibold">
+                                <span class="badge-chip bg-red-50 text-red-700">
                                     Rejected
                                 </span>
                             @else
-                                <span class="px-3 py-1 rounded-full bg-gray-50 text-gray-700 text-xs font-semibold">
+                                <span class="badge-chip bg-slate-100 text-slate-700">
                                     {{ ucfirst($document->status) }}
                                 </span>
                             @endif
                         </td>
 
                         <!-- Date -->
-                        <td class="px-6 py-4 text-gray-600 text-center">
+                        <td class="table-cell text-slate-500 text-center">
                             {{ $document->created_at->format('M d, Y h:i A') }}
                         </td>
 
                         <!-- Actions -->
-                        <td class="px-6 py-4">
+                        <td class="table-cell">
                             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; max-width: 200px; margin: 0 auto;">
                                 
                                 <!-- View Button -->
                                 <a href="{{ route('documents.view', ['id' => $document->id]) }}"
-                                   class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 transition text-xs font-semibold text-center whitespace-nowrap">
+                                   class="action-btn action-btn-neutral text-center whitespace-nowrap">
                                     Details
                                 </a>
 
                                 <!-- Download Button -->
                                 @if ($document->file_path)
                                     <a href="{{ route('documents.download', ['id' => $document->id]) }}"
-                                       class="px-3 py-1.5 rounded-md bg-green-100 text-green-700 hover:bg-green-200 transition text-xs font-semibold text-center whitespace-nowrap">
+                                       class="action-btn action-btn-success text-center whitespace-nowrap">
                                         Download
                                     </a>
                                 @else
-                                    <div class="px-3 py-1.5 rounded-md bg-gray-50 text-gray-400 text-xs font-semibold text-center cursor-not-allowed whitespace-nowrap">
+                                    <div class="action-btn action-btn-disabled text-center whitespace-nowrap">
                                         No File
                                     </div>
                                 @endif
@@ -223,7 +214,7 @@
                                     <button
                                         type="button"
                                         @click="confirmReceive({{ $document->id }}, '{{ $document->document_number }}')"
-                                        class="px-3 py-1.5 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition text-xs font-semibold whitespace-nowrap">
+                                        class="action-btn action-btn-primary whitespace-nowrap">
                                         Receive
                                     </button>
 
@@ -231,7 +222,7 @@
                                     <button
                                         type="button"
                                         @click="openReject({{ $document->id }}, '{{ $document->document_number }}')"
-                                        class="px-3 py-1.5 rounded-md bg-red-600 text-white hover:bg-red-700 transition text-xs font-semibold whitespace-nowrap">
+                                        class="action-btn action-btn-danger whitespace-nowrap">
                                         Reject
                                     </button>
                                 @endif
@@ -253,58 +244,51 @@
                     <!-- RECEIVE CONFIRMATION MODAL -->
                     <tr x-show="showConfirmReceive" x-cloak style="display: none;">
                         <td colspan="9">
-                            <div class="fixed inset-0 z-50 flex items-center justify-center" 
-                                 style="background-color: rgba(11, 31, 58, 0.75); backdrop-filter: blur(8px);"
+                            <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md"
                                  @click.self="showConfirmReceive = false"
                                  x-transition:enter="transition ease-out duration-300"
                                  x-transition:enter-start="opacity-0"
                                  x-transition:enter-end="opacity-100">
                                 
-                                <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4"
+                                <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden"
                                      @click.stop
                                      x-transition:enter="transition ease-out duration-300"
                                      x-transition:enter-start="opacity-0 scale-90 translate-y-4"
                                      x-transition:enter-end="opacity-100 scale-100 translate-y-0">
                                     
-                                    <!-- Header with gradient -->
-                                    <div class="px-6 py-4 rounded-t-2xl border-b" style="background: linear-gradient(to bottom right, #d1fae5, #a7f3d0); border-color: #86efac;">
+                                    <div class="px-6 py-5 border-b border-emerald-200 bg-gradient-to-br from-emerald-50 via-emerald-100/70 to-emerald-50">
                                         <div class="flex items-center gap-3">
-                                            <div class="flex-shrink-0">
-                                                <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #d1fae5;">
-                                                    <svg class="w-5 h-5" style="color: #059669;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <div class="w-11 h-11 rounded-xl bg-white/70 border border-emerald-200 flex items-center justify-center text-emerald-700 shadow-sm">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                                                     </svg>
-                                                </div>
                                             </div>
                                             <div class="flex-1">
-                                                <h3 class="text-base font-bold" style="color: #111827;">Receive Document</h3>
+                                                <h3 class="text-xl font-semibold text-slate-900">Receive Document</h3>
+                                                <p class="text-sm text-slate-600 mt-0.5">Confirm that this document has been received.</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Body -->
-                                    <div class="px-6 py-4">
-                                        <p class="text-sm" style="color: #374151;">
-                                            Receive <span class="font-semibold px-1.5 py-0.5 rounded" style="color: #111827; background-color: #f3f4f6;" x-text="selectedDocNumber"></span>?
+                                    <div class="px-6 py-5">
+                                        <p class="text-sm text-slate-600">
+                                            Receive
+                                            <span class="inline-flex items-center rounded-md bg-slate-100 border border-slate-200 px-2 py-1 text-slate-900 font-semibold" x-text="selectedDocNumber"></span>
+                                            now?
                                         </p>
                                     </div>
 
                                     <!-- Footer -->
-                                    <div class="px-6 py-3 rounded-b-2xl flex justify-end gap-2.5" style="background-color: #f9fafb;">
+                                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2.5">
                                         <button @click="showConfirmReceive = false"
                                                 type="button"
-                                                class="px-4 py-2 rounded-lg transition-all font-medium text-sm"
-                                                style="background-color: white; border: 2px solid #d1d5db; color: #374151;"
-                                                onmouseover="this.style.backgroundColor='#f9fafb'; this.style.borderColor='#9ca3af';"
-                                                onmouseout="this.style.backgroundColor='white'; this.style.borderColor='#d1d5db';">
+                                                class="btn-secondary-modern">
                                             Cancel
                                         </button>
                                         <button @click="submitReceive()"
                                                 type="button"
-                                                class="px-4 py-2 rounded-lg transition-all font-medium text-sm shadow-md"
-                                                style="background-color: #059669; color: white;"
-                                                onmouseover="this.style.backgroundColor='#047857';"
-                                                onmouseout="this.style.backgroundColor='#059669';">
+                                                class="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
                                             Confirm
                                         </button>
                                     </div>
@@ -384,32 +368,29 @@
                     <!-- REJECTION MODAL -->
                     <tr x-show="openRejectModal" x-cloak style="display: none;">
                         <td colspan="9">
-                            <div class="fixed inset-0 z-[10000] flex items-center justify-center p-4"
-                                 style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);"
+                            <div class="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
                                  @click.self="openRejectModal = false"
                                  x-transition:enter="transition ease-out duration-300"
                                  x-transition:enter-start="opacity-0"
                                  x-transition:enter-end="opacity-100">
                                 
-                                <div class="bg-white rounded-2xl shadow-2xl overflow-hidden"
-                                     style="width: 500px; max-height: 90vh;"
+                                <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden w-full max-w-2xl max-h-[90vh]"
                                      @click.stop
                                      x-transition:enter="transition ease-out duration-300"
                                      x-transition:enter-start="opacity-0 scale-90"
                                      x-transition:enter-end="opacity-100 scale-100">
                                     
                                     <!-- Header -->
-                                    <div class="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-red-50 to-white">
+                                    <div class="flex items-center justify-between px-6 py-5 border-b border-red-200 bg-gradient-to-r from-red-50 via-rose-50/70 to-white">
                                         <div>
-                                            <h2 class="text-lg font-semibold text-gray-800">Reject Document</h2>
-                                            <p class="text-sm text-gray-600 mt-0.5" x-text="rejectionDocNumber"></p>
+                                            <h2 class="text-2xl font-semibold text-slate-900">Reject Document</h2>
+                                            <p class="text-sm text-slate-600 mt-1" x-text="rejectionDocNumber"></p>
                                         </div>
 
                                         <button
                                             @click="openRejectModal = false"
                                             type="button"
-                                            class="w-9 h-9 flex items-center justify-center rounded-full 
-                                                   hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition duration-200"
+                                            class="w-10 h-10 flex items-center justify-center rounded-xl border border-transparent hover:border-slate-300 hover:bg-white text-slate-500 hover:text-slate-700 transition duration-200"
                                         >
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -421,13 +402,13 @@
                                     <form 
                                         :action="'/documents/' + rejectionDocId + '/reject'" 
                                         method="POST"
-                                        class="px-6 py-4"
+                                        class="px-6 py-5"
                                         @submit.prevent="submitReject($event)"
                                     >
                                         @csrf
 
-                                        <div class="mb-4">
-                                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <div class="mb-5">
+                                            <label class="block text-sm font-semibold text-slate-700 mb-2">
                                                 Reason for Rejection <span class="text-red-500">*</span>
                                             </label>
                                             <textarea
@@ -435,44 +416,40 @@
                                                 required
                                                 rows="5"
                                                 placeholder="Please provide a detailed reason for rejecting this document..."
-                                                class="w-full rounded-lg border border-gray-300 px-4 py-2.5
+                                                class="w-full rounded-xl border border-slate-300 px-4 py-3
                                                        focus:ring-2 focus:ring-red-500 focus:border-red-500 
                                                        outline-none text-sm transition duration-200
-                                                       hover:border-gray-400 resize-none"
+                                                       hover:border-slate-400 resize-none"
                                             ></textarea>
-                                            <p class="text-xs text-gray-500 mt-2">This reason will be visible to the sender.</p>
+                                            <p class="text-xs text-slate-500 mt-2">This reason will be visible to the sender.</p>
                                         </div>
 
                                         <!-- Warning -->
-                                        <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                            <div class="flex gap-2">
+                                        <div class="mb-5 p-4 bg-red-50/80 border border-red-200 rounded-xl">
+                                            <div class="flex gap-3">
                                                 <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                                 </svg>
                                                 <div>
-                                                    <p class="text-sm font-semibold text-red-800">Are you sure?</p>
-                                                    <p class="text-xs text-red-700 mt-0.5">This action cannot be undone. The document will be marked as rejected.</p>
+                                                    <p class="text-base font-semibold text-red-800">Are you sure?</p>
+                                                    <p class="text-sm text-red-700 mt-0.5">This action cannot be undone. The document will be marked as rejected.</p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <!-- Footer -->
-                                        <div class="flex justify-end gap-3 pt-4 border-t">
+                                        <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
                                             <button
                                                 type="button"
                                                 @click="openRejectModal = false"
-                                                class="px-6 py-2.5 rounded-lg border-2 border-gray-300
-                                                       text-gray-700 hover:bg-gray-50 transition duration-200 
-                                                       font-semibold text-sm"
+                                                class="btn-secondary-modern"
                                             >
                                                 Cancel
                                             </button>
 
                                             <button
                                                 type="submit"
-                                                class="px-6 py-2.5 rounded-lg bg-red-600 text-white font-semibold text-sm
-                                                       hover:bg-red-700 shadow-lg hover:shadow-xl transition duration-200
-                                                       transform hover:-translate-y-0.5"
+                                                class="inline-flex items-center justify-center rounded-xl bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 transition"
                                             >
                                                 Reject Document
                                             </button>

@@ -1,20 +1,24 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
 
             <!-- LEFT: Logo + Links -->
-            <div class="flex items-center">
+            <div class="flex items-center gap-4">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
                         <img src="{{ asset('images/logo.png') }}"
                              alt="Company Logo"
-                             class="h-9 w-auto object-contain">
+                             class="h-9 w-auto object-contain drop-shadow-sm">
+                        <div class="hidden lg:block leading-tight">
+                            <p class="text-xs uppercase tracking-[0.14em] text-slate-500">AFPPGMC</p>
+                            <p class="text-sm font-semibold text-slate-900">Document Tracker</p>
+                        </div>
                     </a>
                 </div>
 
                 <!-- Desktop Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden sm:ms-4 sm:flex sm:items-center sm:gap-1 panel-surface-soft px-2 py-1.5">
 
                     <x-nav-link
                         :href="route('incoming.index')"
@@ -69,14 +73,14 @@
                     <button 
                         @click="notificationOpen = !notificationOpen"
                         @click.away="notificationOpen = false"
-                        class="relative inline-flex items-center justify-center w-10 h-10 text-gray-600 hover:text-gray-800 rounded-full transition focus:outline-none">
+                        class="relative inline-flex items-center justify-center w-10 h-10 text-slate-600 hover:text-slate-900 rounded-xl border border-transparent hover:border-slate-200 hover:bg-white transition focus:outline-none">
                         <!-- Bell Icon SVG with Badge positioned OUTSIDE -->
                         <div class="relative">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             @if(auth()->user()->unreadNotifications->count() > 0)
-                                <span class="absolute -top-2 -right-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-red-600 rounded-full border-2 border-white">
+                                <span class="absolute -top-2 -right-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-bold text-white bg-red-600 rounded-full border-2 border-white shadow-sm">
                                     {{ auth()->user()->unreadNotifications->count() }}
                                 </span>
                             @endif
@@ -92,23 +96,23 @@
                         x-transition:leave="transition ease-in duration-75"
                         x-transition:leave-start="transform opacity-100 scale-100"
                         x-transition:leave-end="transform opacity-0 scale-95"
-                        class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 overflow-hidden"
+                        class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden"
                         style="display: none;">
                         
                         <!-- Header -->
-                        <div class="px-5 py-4 bg-white">
+                        <div class="px-5 py-4 bg-white border-b border-slate-100">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-gray-900">Notifications</h3>
-                                <a href="{{ route('notifications.index') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                <h3 class="text-lg font-bold text-slate-900">Notifications</h3>
+                                <a href="{{ route('notifications.index') }}" class="text-sm text-blue-700 hover:text-blue-900 font-medium">
                                     View All
                                 </a>
                             </div>
                         </div>
 
 <!-- Notification List -->
-<div class="max-h-96 overflow-y-auto bg-gray-50">
+<div class="max-h-96 overflow-y-auto bg-slate-50 modern-scrollbar">
     @forelse(auth()->user()->unreadNotifications->take(5) as $notification)
-        <div class="block px-5 py-4 bg-white border-b border-gray-100">
+        <div class="block px-5 py-4 bg-white border-b border-slate-100">
             <div class="flex items-start gap-3">
                 <!-- Notification Icon -->
                 @php
@@ -152,15 +156,15 @@
                 </div>
                 
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 leading-snug">
+                    <p class="text-sm font-medium text-slate-900 leading-snug">
                         {{ $notification->data['message'] ?? 'New notification' }}
                     </p>
                     @if(isset($notification->data['document_number']))
-                        <p class="text-xs text-gray-600 mt-1 font-medium">
+                        <p class="text-xs text-slate-600 mt-1 font-medium">
                             {{ $notification->data['document_number'] }}
                         </p>
                     @endif
-                    <p class="text-xs text-gray-400 mt-1">
+                    <p class="text-xs text-slate-400 mt-1">
                         {{ $notification->created_at->diffForHumans() }}
                     </p>
                 </div>
@@ -170,7 +174,7 @@
                     <input type="hidden" name="stay" value="1">
                     <button
                         type="submit"
-                        class="inline-flex items-center justify-center w-5 h-5 text-blue-600 border border-blue-500 hover:bg-blue-50 rounded-full transition-all duration-200"
+                        class="inline-flex items-center justify-center w-5 h-5 text-blue-700 border border-blue-500 hover:bg-blue-50 rounded-full transition-all duration-200"
                         title="Mark as read"
                     >
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -182,22 +186,22 @@
         </div>
     @empty
         <div class="px-5 py-12 text-center bg-white">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-3">
-                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-full mb-3">
+                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
-            <p class="text-sm text-gray-500 font-medium">No new notifications</p>
+            <p class="text-sm text-slate-500 font-medium">No new notifications</p>
         </div>
     @endforelse
 </div>
 
                         <!-- Footer -->
                         @if(auth()->user()->unreadNotifications->count() > 0)
-                            <div class="px-5 py-3 bg-white border-t border-gray-200">
+                            <div class="px-5 py-3 bg-white border-t border-slate-200">
                                 <form action="{{ route('notifications.read-all') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-semibold py-1">
+                                    <button type="submit" class="w-full text-center text-sm text-blue-700 hover:text-blue-900 font-semibold py-1">
                                         Mark all as read
                                     </button>
                                 </form>
@@ -210,15 +214,15 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button
-                            class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-500 bg-white hover:text-blue-900 focus:outline-none transition">
+                            class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl text-slate-700 bg-white border border-slate-200 hover:text-slate-900 hover:shadow-sm focus:outline-none transition">
                             <!-- Profile Picture -->
                             @if (Auth::user()->profile_picture)
                                 <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" 
                                      alt="{{ Auth::user()->name }}" 
-                                     class="h-8 w-8 rounded-full object-cover border border-gray-300 me-2">
+                                     class="h-8 w-8 rounded-full object-cover border border-slate-300 me-2">
                             @else
-                                <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center me-2">
-                                    <span class="text-gray-600 font-semibold text-sm">
+                                <div class="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center me-2">
+                                    <span class="text-slate-600 font-semibold text-sm">
                                         {{ substr(Auth::user()->name, 0, 1) }}
                                     </span>
                                 </div>
@@ -238,14 +242,25 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            Profile
+                            <span class="inline-flex items-center gap-2">
+                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12a4 4 0 100-8 4 4 0 000 8z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 20a6 6 0 0112 0" />
+                                </svg>
+                                <span>Profile</span>
+                            </span>
                         </x-dropdown-link>
 
                         <button
                             @click="window.dispatchEvent(new CustomEvent('open-logout-modal'))"
                             type="button"
-                            class="block w-full text-left px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out">
-                            Log Out
+                            class="block w-full text-left px-4 py-2 text-sm leading-5 text-slate-700 hover:bg-slate-100 focus:outline-none focus:bg-slate-100 transition duration-150 ease-in-out">
+                            <span class="inline-flex items-center gap-2">
+                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H9m4 8H7a2 2 0 01-2-2V6a2 2 0 012-2h6" />
+                                </svg>
+                                <span>Log Out</span>
+                            </span>
                         </button>
                     </x-slot>
                 </x-dropdown>
@@ -254,7 +269,7 @@
             <!-- Mobile Hamburger -->
             <div class="-me-3 flex items-center sm:hidden">
                 <button @click="open = !open"
-                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-blue-900 hover:bg-gray-100 transition">
+                        class="inline-flex items-center justify-center p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-white transition border border-transparent hover:border-slate-200">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{ 'hidden': open, 'inline-flex': !open }"
                               stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -270,8 +285,8 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div :class="{ 'block': open, 'hidden': !open }" class="sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
+    <div :class="{ 'block': open, 'hidden': !open }" class="sm:hidden border-t border-slate-200 bg-white/95 backdrop-blur">
+        <div class="px-4 pt-3 pb-3 space-y-1.5">
             <x-responsive-nav-link :href="route('incoming.index')" :active="request()->routeIs('incoming.*')">
                 Incoming
             </x-responsive-nav-link>
@@ -313,26 +328,26 @@
         </div>
 
         <!-- Mobile User Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
+        <div class="pt-4 pb-4 border-t border-slate-200">
             <div class="px-4 flex items-center gap-3">
                 @if (Auth::user()->profile_picture)
                     <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" 
                          alt="{{ Auth::user()->name }}" 
-                         class="h-10 w-10 rounded-full object-cover border border-gray-300">
+                         class="h-10 w-10 rounded-full object-cover border border-slate-300">
                 @else
-                    <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                        <span class="text-gray-600 font-semibold">
+                    <div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center">
+                        <span class="text-slate-600 font-semibold">
                             {{ substr(Auth::user()->name, 0, 1) }}
                         </span>
                     </div>
                 @endif
                 <div>
-                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                    <div class="font-medium text-base text-slate-800">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-slate-500">{{ Auth::user()->email }}</div>
                 </div>
             </div>
 
-            <div class="mt-3 space-y-1">
+            <div class="mt-3 px-4 space-y-1.5">
                 <x-responsive-nav-link :href="route('profile.edit')">
                     Profile
                 </x-responsive-nav-link>
@@ -340,7 +355,7 @@
                 <button
                     @click="window.dispatchEvent(new CustomEvent('open-logout-modal'))"
                     type="button"
-                    class="block w-full text-left px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 focus:outline-none focus:text-gray-800 focus:bg-gray-50 transition duration-150 ease-in-out">
+                    class="block w-full text-left px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg border border-transparent hover:border-slate-200 focus:outline-none transition duration-150 ease-in-out">
                     Log Out
                 </button>
             </div>

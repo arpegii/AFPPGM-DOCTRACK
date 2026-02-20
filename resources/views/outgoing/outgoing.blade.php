@@ -1,15 +1,10 @@
 @extends('layouts.app')
 
 @section('header')
-<div class="bg-white border-b">
-    <div class="max-w-7xl mx-auto px-6 py-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-semibold text-gray-900">
-                    Outgoing Documents
-                </h1>
-            </div>
-        </div>
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Outgoing Documents</h1>
+        <p class="page-subtitle">Documents sent by your unit and current disposition</p>
     </div>
 </div>
 @endsection
@@ -18,19 +13,19 @@
 
 <!-- Success Message -->
 @if (session('success'))
-    <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+    <div class="py-4">
+        <div class="panel-surface-soft border-emerald-200 bg-emerald-50 text-emerald-800 px-4 py-3 rounded-lg">
             {{ session('success') }}
         </div>
     </div>
 @endif
 
 @if(auth()->user()->isAdmin())
-    <div class="max-w-7xl mx-auto px-6 pb-2">
-        <form method="GET" action="{{ route('outgoing.index') }}" class="bg-white border border-gray-200 rounded-xl p-4">
+    <div class="pb-2">
+        <form method="GET" action="{{ route('outgoing.index') }}" class="filter-card">
             <div class="flex flex-col md:flex-row md:items-center gap-3">
                 <div class="md:flex-1">
-                    <select name="unit_id" class="w-full rounded-lg border-gray-300 text-sm">
+                    <select name="unit_id" class="form-select-modern">
                         <option value="">All units</option>
                         @foreach($filterUnits as $unit)
                             <option value="{{ $unit->id }}" {{ (string) $selectedUnitId === (string) $unit->id ? 'selected' : '' }}>
@@ -40,10 +35,10 @@
                     </select>
                 </div>
                 <div class="flex gap-2 md:justify-end md:ml-auto">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition">
+                    <button type="submit" class="btn-primary-modern">
                         Apply
                     </button>
-                    <a href="{{ route('outgoing.index', ['unit_id' => '']) }}" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition">
+                    <a href="{{ route('outgoing.index', ['unit_id' => '']) }}" class="btn-secondary-modern">
                         Reset
                     </a>
                 </div>
@@ -53,17 +48,13 @@
 @endif
 
 <!-- CENTER WRAPPER -->
-<div class="flex justify-center w-full py-6">
-
-    <!-- CARD -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-7xl">
-
-        <!-- Table Wrapper -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-gray-700 border-collapse">
+<div class="py-6">
+    <div class="table-shell">
+        <div class="overflow-x-auto modern-scrollbar">
+            <table class="table-modern">
 
                 <!-- Table Head -->
-                <thead class="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase text-xs tracking-wider">
+                <thead class="table-head border-b border-slate-200">
                     <tr>
                         <th class="px-6 py-4 text-center">#</th>
                         <th class="px-6 py-4 text-left">Document No.</th>
@@ -77,16 +68,16 @@
                 </thead>
 
                 <!-- Table Body -->
-                <tbody class="divide-y divide-gray-100">
+                <tbody>
 
                     @forelse ($documents as $document)
-                        <tr class="hover:bg-gray-50 transition">
+                        <tr class="table-row">
 
-                            <td class="px-6 py-4 font-medium text-gray-800 text-center">
+                            <td class="px-6 py-4 font-medium text-slate-700 text-center">
                                 {{ $loop->iteration }}
                             </td>
 
-                            <td class="px-6 py-4 font-semibold text-gray-900 text-left">
+                            <td class="px-6 py-4 font-semibold text-slate-900 text-left">
                                 {{ $document->document_number }}
                             </td>
 
@@ -95,7 +86,7 @@
                             </td>
 
                             <td class="px-6 py-4 text-center">
-                                <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
+                                <span class="badge-chip bg-blue-50 text-blue-700">
                                     {{ $document->document_type }}
                                 </span>
                             </td>
@@ -107,25 +98,25 @@
                             <!-- Status -->
                             <td class="px-6 py-4 text-center">
                                 @if($document->status == 'incoming')
-                                    <span class="px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-semibold">
+                                    <span class="badge-chip bg-amber-50 text-amber-700">
                                         Pending
                                     </span>
                                 @elseif($document->status == 'received')
-                                    <span class="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold">
+                                    <span class="badge-chip bg-emerald-50 text-emerald-700">
                                         Received
                                     </span>
                                 @elseif($document->status == 'rejected')
-                                    <span class="px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-semibold">
+                                    <span class="badge-chip bg-red-50 text-red-700">
                                         Rejected
                                     </span>
                                 @else
-                                    <span class="px-3 py-1 rounded-full bg-gray-50 text-gray-700 text-xs font-semibold">
+                                    <span class="badge-chip bg-slate-100 text-slate-700">
                                         {{ ucfirst($document->status) }}
                                     </span>
                                 @endif
                             </td>
 
-                            <td class="px-6 py-4 text-gray-600 text-center">
+                            <td class="px-6 py-4 text-slate-500 text-center">
                                 {{ $document->created_at->format('M d, Y h:i A') }}
                             </td>
 
@@ -134,13 +125,13 @@
                                 <div class="flex items-center justify-center gap-2">
 
                                     <a href="{{ route('documents.view', ['id' => $document->id]) }}"
-                                       class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 transition text-xs font-semibold">
+                                       class="action-btn bg-slate-100 text-slate-700 hover:bg-slate-200">
                                         Details
                                     </a>
 
                                     @if ($document->file_path)
                                         <a href="{{ route('documents.download', ['id' => $document->id]) }}"
-                                           class="px-3 py-1.5 rounded-md bg-green-100 text-green-700 hover:bg-green-200 transition text-xs font-semibold">
+                                           class="action-btn bg-emerald-100 text-emerald-700 hover:bg-emerald-200">
                                             Download
                                         </a>
                                     @endif
@@ -151,7 +142,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="9" class="table-empty">
                                 <div class="flex flex-col items-center gap-2">
                                     <span class="text-lg">📄</span>
                                     <span>No outgoing documents found</span>

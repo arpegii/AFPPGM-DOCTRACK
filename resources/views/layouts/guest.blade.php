@@ -5,7 +5,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        @php
+            $explicitTitle = trim($__env->yieldContent('title'));
+            $routeName = request()->route()?->getName();
+            $routeTitle = $routeName
+                ? \Illuminate\Support\Str::of($routeName)->replace('.index', '')->replace(['.', '-'], ' ')->headline()->value()
+                : null;
+            $pageTitle = $explicitTitle !== '' ? $explicitTitle : $routeTitle;
+        @endphp
+        <title>{{ $pageTitle ?: config('app.name', 'AFPPGMC Document Tracking System') }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

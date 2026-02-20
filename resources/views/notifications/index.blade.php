@@ -1,10 +1,29 @@
 @extends('layouts.app')
 
+@section('header')
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Notifications</h1>
+        <p class="page-subtitle">Stay updated with your document activities</p>
+    </div>
+    @if(auth()->user()->unreadNotifications->count() > 0)
+        <form action="{{ route('notifications.read-all') }}" method="POST">
+            @csrf
+            <button type="submit" class="btn-primary-modern inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Mark All as Read
+            </button>
+        </form>
+    @endif
+</div>
+@endsection
+
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
-    <div class="container mx-auto px-4">
-        <div
-            class="max-w-5xl mx-auto"
+<div class="py-6">
+    <div
+            class="w-full"
             x-data="{
                 selectedNotifications: [],
                 pageNotificationIds: @js($notifications->pluck('id')->values()),
@@ -81,29 +100,8 @@
                 </div>
             @endif
             
-            <!-- Modern Header with Gradient -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-900 mb-2">Notifications</h1>
-                        <p class="text-gray-600">Stay updated with your document activities</p>
-                    </div>
-                    @if(auth()->user()->unreadNotifications->count() > 0)
-                        <form action="{{ route('notifications.read-all') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30 transition-all duration-200 hover:scale-105">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Mark All as Read
-                            </button>
-                        </form>
-                    @endif
-                </div>
-                
-                <!-- Stats Bar -->
-                <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <div class="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="panel-surface p-4">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -111,13 +109,13 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold text-gray-900">{{ auth()->user()->notifications->count() }}</p>
-                                <p class="text-sm text-gray-500">Total</p>
+                                <p class="text-2xl font-bold text-slate-900">{{ auth()->user()->notifications->count() }}</p>
+                                <p class="text-sm text-slate-500">Total</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                    <div class="panel-surface p-4">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -125,13 +123,13 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold text-gray-900">{{ auth()->user()->unreadNotifications->count() }}</p>
-                                <p class="text-sm text-gray-500">Unread</p>
+                                <p class="text-2xl font-bold text-slate-900">{{ auth()->user()->unreadNotifications->count() }}</p>
+                                <p class="text-sm text-slate-500">Unread</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                    <div class="panel-surface p-4">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
                                 <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -139,17 +137,16 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold text-gray-900">{{ auth()->user()->notifications->where('read_at', '!=', null)->count() }}</p>
-                                <p class="text-sm text-gray-500">Read</p>
+                                <p class="text-2xl font-bold text-slate-900">{{ auth()->user()->notifications->where('read_at', '!=', null)->count() }}</p>
+                                <p class="text-sm text-slate-500">Read</p>
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
 
             <!-- Bulk Select Actions -->
             @if($notifications->count() > 0)
-                <div class="mb-5 bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                <div class="mb-5 panel-surface p-4">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <label class="inline-flex items-center gap-3 text-sm font-medium text-gray-700">
                             <input
@@ -193,7 +190,7 @@
             <!-- Notifications List -->
             <div class="space-y-3">
                 @forelse($notifications as $notification)
-                    <div class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-200 {{ is_null($notification->read_at) ? 'ring-2 ring-blue-500/20' : '' }}">
+                    <div class="group panel-surface overflow-hidden hover:shadow-md transition-all duration-200 {{ is_null($notification->read_at) ? 'ring-2 ring-blue-500/20' : '' }}">
                         <div class="p-5">
                             <div class="flex items-start gap-4">
                                 <div class="pt-1">
@@ -451,7 +448,7 @@
                     </div>
                 @empty
                     <!-- Empty State -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="panel-surface overflow-hidden">
                         <div class="text-center py-20">
                             <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full mb-6">
                                 <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -474,7 +471,7 @@
             >
                 <div class="absolute inset-0 bg-black/50" @click="closeSingleDeleteModal()"></div>
 
-                <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl border border-gray-100 p-6">
+                <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl border border-slate-200 p-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-2">Confirm Delete</h3>
                     <p class="text-sm text-gray-600 mb-6">
                         Are you sure you want to delete this notification?
@@ -512,7 +509,7 @@
             >
                 <div class="absolute inset-0 bg-black/50" @click="closeConfirmModal()"></div>
 
-                <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl border border-gray-100 p-6">
+                <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl border border-slate-200 p-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-2" x-text="pendingAction === 'delete' ? 'Confirm Delete' : 'Confirm Mark as Read'"></h3>
                     <p class="text-sm text-gray-600 mb-6" x-text="pendingAction === 'delete'
                         ? `Are you sure you want to delete ${selectedCount} selected notification(s)?`
@@ -558,7 +555,6 @@
                     {{ $notifications->links() }}
                 </div>
             @endif
-        </div>
     </div>
 </div>
 @endsection

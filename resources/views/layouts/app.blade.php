@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    @php
+        $explicitTitle = trim($__env->yieldContent('title'));
+        $routeName = request()->route()?->getName();
+        $routeTitle = $routeName
+            ? \Illuminate\Support\Str::of($routeName)->replace('.index', '')->replace(['.', '-'], ' ')->headline()->value()
+            : null;
+        $pageTitle = $explicitTitle !== '' ? $explicitTitle : $routeTitle;
+    @endphp
+    <title>{{ $pageTitle ?: config('app.name', 'AFPPGMC Document Tracking System') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -26,24 +35,28 @@
     </style>
 </head>
 
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-sans antialiased min-h-screen">
 
     {{-- Navigation --}}
     @include('layouts.navigation')
 
     {{-- Page Header (supports x-app-layout + @section) --}}
     @if (isset($header))
-        <header class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-6 py-5">
-                {{ $header }}
+        <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            <div class="panel-surface px-6 py-5">
+                <div class="text-slate-900">
+                    {{ $header }}
+                </div>
             </div>
         </header>
     @elseif(View::hasSection('header'))
-        @yield('header')
+        <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            @yield('header')
+        </header>
     @endif
 
     {{-- Page Content --}}
-    <main class="max-w-7xl mx-auto px-6 py-6">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {{ $slot ?? '' }}
         @yield('content')
     </main>

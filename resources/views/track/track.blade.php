@@ -1,16 +1,10 @@
 @extends('layouts.app')
 
 @section('header')
-<div class="bg-white border-b">
-    <div class="max-w-7xl mx-auto px-6 py-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-semibold text-gray-900">
-                    Track Document
-                </h1>
-                <p class="text-sm text-gray-600 mt-1">Search and track documents by number or title</p>
-            </div>
-        </div>
+<div class="page-hero">
+    <div>
+        <h1 class="page-title">Track Document</h1>
+        <p class="page-subtitle">Search and track documents by number or title</p>
     </div>
 </div>
 @endsection
@@ -218,29 +212,28 @@
 
 <!-- Search Section -->
 <div class="flex justify-center w-full py-6">
-    <div class="w-full max-w-7xl px-6">
+    <div class="w-full">
         
         <!-- Search Box -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="panel-surface p-6 mb-6">
             <form method="GET" action="{{ route('track.index') }}" class="flex gap-4">
                 <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-600 mb-2">Enter document number</label>
+                    <label class="block text-sm font-medium text-slate-600 mb-2">Enter document number</label>
                     <input 
                         type="text" 
                         name="search" 
                         value="{{ $searchQuery ?? '' }}"
                         placeholder="Search here..."
-                        class="w-full rounded-lg border border-gray-300 px-4 py-3
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3
                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                                outline-none text-sm transition duration-200
-                               hover:border-gray-400"
+                               hover:border-slate-400"
                         autofocus
                     >
                 </div>
                 <button 
                     type="submit"
-                    class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                           transition text-sm font-semibold shadow-sm hover:shadow-md
+                    class="btn-primary-modern px-8 py-3
                            flex items-center gap-2 self-end"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
