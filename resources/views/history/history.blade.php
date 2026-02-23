@@ -108,7 +108,7 @@
                                 >
                                     <option value="all">All Documents</option>
                                     <option value="received">Received Only</option>
-                                    <option value="incoming">Forwarded Only</option>
+                                    <option value="incoming">Incoming Only</option>
                                     <option value="rejected">Rejected Only</option>
                                 </select>
                             </div>

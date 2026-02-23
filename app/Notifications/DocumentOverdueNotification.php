@@ -52,13 +52,15 @@ class DocumentOverdueNotification extends Notification implements ShouldQueue
     {
         $pendingDays = $this->getPendingDays();
         $overdueDays = $this->getOverdueDays();
+        $pendingLabel = $pendingDays === 1 ? 'day' : 'days';
+        $overdueLabel = $overdueDays === 1 ? 'day' : 'days';
 
         return [
             'document_id' => $this->document->id,
             'document_number' => $this->document->document_number,
             'title' => $this->document->title,
             'type' => 'document_overdue',
-            'message' => "Overdue document pending in your unit for {$pendingDays} days ({$overdueDays} days overdue).",
+            'message' => "Overdue document pending in your unit for {$pendingDays} {$pendingLabel} ({$overdueDays} {$overdueLabel} overdue).",
             'receiving_unit_id' => $this->document->receiving_unit_id,
             'receiving_unit' => $this->document->receivingUnit->name ?? 'Unknown Unit',
             'sender_unit' => $this->document->senderUnit->name ?? 'Unknown Unit',
@@ -80,9 +82,15 @@ class DocumentOverdueNotification extends Notification implements ShouldQueue
     protected function getOverdueDays(): int
     {
         $overdueStartDate = $this->getPendingStartDate()->copy()->addDays(3);
+        $minutesOverdue = $overdueStartDate->diffInMinutes(now(), false);
 
-        // Count elapsed whole days since the document became overdue.
-        return max(0, (int) $overdueStartDate->diffInDays(now(), false));
+        if ($minutesOverdue <= 0) {
+            return 0;
+        }
+
+        // As soon as document passes the 3-day limit, it is 1 day overdue.
+        // Then it increments to 2, 3, ... for succeeding days.
+        return (int) ceil($minutesOverdue / (24 * 60));
     }
 
     protected function getPendingStartDate()

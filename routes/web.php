@@ -10,7 +10,6 @@ use App\Http\Controllers\RejectedController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\DocumentController;
-use App\Http\Controllers\ForwardedController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController; // ← ADD THIS
 
@@ -74,8 +73,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/rejected', [RejectedController::class, 'index'])->name('rejected.index');
     Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
     Route::get('/track', [TrackController::class, 'index'])->name('track.index');
-    Route::get('/forwarded', [DocumentController::class, 'forwarded'])->name('forwarded.index');
-
     /*
     |--------------------------------------------------------------------------
     | Document Management Routes
@@ -89,8 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('documents.next-number');
 
     // Show forwarded documents
-    Route::get('/forwarded', [DocumentController::class, 'forwarded'])
-        ->name('forwarded.index');
+    Route::get('/forwarded', [DocumentController::class, 'forwarded'])->name('forwarded.index');
 
     // Document CRUD operations
     Route::post('/documents', [DocumentController::class, 'store'])->name('documents.store');

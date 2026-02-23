@@ -53,11 +53,10 @@ class ReceivedController extends Controller
 
             $documents = $query->orderBy('updated_at', 'desc')->get();
         } else {
-            // Users see documents they marked as received from incoming.
+            // Users see all received documents for their unit.
             $documents = Document::with(['senderUnit', 'receivingUnit'])
                 ->where('receiving_unit_id', $user->unit_id)
                 ->where('status', 'received')
-                ->where('received_by', $user->id)
                 ->orderBy('updated_at', 'desc')
                 ->get();
         }

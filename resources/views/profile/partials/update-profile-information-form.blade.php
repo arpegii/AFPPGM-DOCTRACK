@@ -64,28 +64,27 @@
         @csrf
         @method('patch')
 
-        <div class="flex justify-between items-start gap-8">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start">
             <!-- Left side - Header and Form -->
-            <div class="flex-1" style="max-width: 600px;">
+            <div class="w-full">
                 <header>
-                    <h2 class="text-lg font-medium text-gray-900">
+                    <h2 class="text-lg font-semibold text-slate-900">
                         {{ __('Profile Information') }}
                     </h2>
 
-                    <p class="mt-1 text-sm text-gray-600">
+                    <p class="mt-1 text-sm text-slate-600">
                         {{ __("Update your account's profile information and email address.") }}
                     </p>
                 </header>
 
-                <div class="mt-6">
-                    <div class="mb-6">
+                <div class="mt-6 space-y-5">
+                    <div>
                         <x-input-label for="name" :value="__('Name')" />
                         <x-text-input 
                             id="name" 
                             name="name" 
                             type="text" 
-                            class="mt-1 block w-full bg-gray-100 cursor-not-allowed" 
-                            style="width: 100% !important; min-width: 400px;" 
+                            class="mt-1 block w-full bg-slate-100 cursor-not-allowed" 
                             :value="old('name', $user->name)" 
                             readonly 
                             autocomplete="name" 
@@ -93,14 +92,13 @@
                         <x-input-error class="mt-2" :messages="$errors->get('name')" />
                     </div>
 
-                    <div class="mb-6">
+                    <div>
                         <x-input-label for="email" :value="__('Email')" />
                         <x-text-input 
                             id="email" 
                             name="email" 
                             type="email" 
                             class="mt-1 block w-full" 
-                            style="width: 100% !important; min-width: 400px;" 
                             :value="old('email', $user->email)"
                             x-model="email"
                             @input="validateEmail()"
@@ -141,10 +139,10 @@
 
                         @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                             <div>
-                                <p class="text-sm mt-2 text-gray-800">
+                                <p class="text-sm mt-2 text-slate-800">
                                     {{ __('Your email address is unverified.') }}
 
-                                    <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <button form="send-verification" class="underline text-sm text-slate-600 hover:text-slate-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                         {{ __('Click here to re-send the verification email.') }}
                                     </button>
                                 </p>
@@ -161,7 +159,7 @@
             </div>
 
             <!-- Right side - Profile Picture aligned with header -->
-            <div class="flex flex-col items-center flex-shrink-0" style="min-width: 200px;">
+            <div class="flex w-full max-w-[220px] flex-col items-center justify-self-start lg:justify-self-center">
                 <x-input-label for="profile_picture" :value="__('Profile Picture')" class="mb-3" />
                 
                 <!-- Profile Picture Preview -->
@@ -195,7 +193,7 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-4 mt-6">
+        <div class="mt-6 flex flex-wrap items-center gap-3">
             <!-- Show different button based on whether email changed -->
             <template x-if="!emailChanged">
                 <x-primary-button type="submit" x-bind:disabled="!isValidEmail">{{ __('Save') }}</x-primary-button>

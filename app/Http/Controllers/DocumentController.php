@@ -139,7 +139,7 @@ class DocumentController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('documents', $fileName, 'public');
+            $filePath = $file->storeAs('documents', $fileName, 'local');
         }
 
         $document = Document::create([
@@ -264,7 +264,7 @@ class DocumentController extends Controller
             return back()->with('error', 'Only received documents can be forwarded.');
         }
 
-        if ($request->forward_to_unit_id == $user->unit_id) {
+        if ($request->forward_to_unit_id == $document->receiving_unit_id) {
             return back()->with('error', 'You cannot forward a document to your own unit.');
         }
 
@@ -273,7 +273,7 @@ class DocumentController extends Controller
 
             $forwardHistory = DocumentForwardHistory::create([
                 'document_id' => $document->id,
-                'from_unit_id' => $user->unit_id,
+                'from_unit_id' => $document->receiving_unit_id,
                 'to_unit_id' => $request->forward_to_unit_id,
                 'forwarded_by_user_id' => $user->id,
                 'notes' => $request->notes,
@@ -387,7 +387,7 @@ class DocumentController extends Controller
         }
 
         /** @var FilesystemAdapter $disk */
-        $disk = Storage::disk('public');
+        $disk = Storage::disk('local');
 
         if (!$document->file_path || !$disk->exists($document->file_path)) {
             abort(404, 'File not found.');

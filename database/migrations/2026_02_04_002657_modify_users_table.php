@@ -12,7 +12,9 @@ return new class extends Migration
 public function up()
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('unit');
+        if (Schema::hasColumn('users', 'unit')) {
+            $table->dropColumn('unit');
+        }
         $table->foreignId('unit_id')->nullable()->constrained()->onDelete('cascade');
     });
 }
@@ -23,6 +25,13 @@ public function up()
      */
     public function down(): void
     {
-        //
+        Schema::table('users', function (Blueprint $table) {
+            if (Schema::hasColumn('users', 'unit_id')) {
+                $table->dropConstrainedForeignId('unit_id');
+            }
+            if (!Schema::hasColumn('users', 'unit')) {
+                $table->string('unit')->nullable();
+            }
+        });
     }
 };

@@ -30,15 +30,18 @@ class ReportController extends Controller
         $statusFilter = $request->status_filter;
         $format = $request->format;
 
-        // Query documents based on filters - Get ALL documents for the user's unit
+        // Query documents based on filters.
         $user = auth()->user();
-        
+
         $query = Document::with(['senderUnit', 'receivingUnit'])
-            ->where(function($q) use ($user) {
+            ->whereBetween('created_at', [$startDate, $endDate]);
+
+        if (!$user->isAdmin()) {
+            $query->where(function($q) use ($user) {
                 $q->where('sender_unit_id', $user->unit_id)
                   ->orWhere('receiving_unit_id', $user->unit_id);
-            })
-            ->whereBetween('created_at', [$startDate, $endDate]);
+            });
+        }
 
         if ($statusFilter !== 'all') {
             $query->where('status', $statusFilter);
@@ -69,7 +72,7 @@ class ReportController extends Controller
         $filterMap = [
             'all' => 'All Documents',
             'received' => 'Received Only',
-            'incoming' => 'Forwarded Only',
+            'incoming' => 'Incoming Only',
             'rejected' => 'Rejected Only'
         ];
         return $filterMap[$filter] ?? $filter;
@@ -253,7 +256,7 @@ class ReportController extends Controller
         $currentRow = 1;
 
         // Add logo - positioned ABOVE the title
-        $logoPath = public_path('logo.png');
+        $logoPath = public_path('/images/logo.png');
         if (file_exists($logoPath)) {
             $drawing = new Drawing();
             $drawing->setName('Logo');

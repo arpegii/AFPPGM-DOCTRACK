@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -12,7 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // For MySQL
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         DB::statement("ALTER TABLE documents MODIFY COLUMN status ENUM('incoming', 'received', 'rejected', 'forwarded') NOT NULL");
     }
 
@@ -21,6 +22,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         DB::statement("ALTER TABLE documents MODIFY COLUMN status ENUM('incoming', 'received', 'rejected') NOT NULL");
     }
 };

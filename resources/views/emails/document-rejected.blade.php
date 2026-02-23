@@ -88,23 +88,10 @@
                 <div class="message">
                     Please review the rejection reason and take necessary action to address the issues.
                 </div>
-
-                <!-- Signature -->
-                <div class="signature">
-                    <p style="margin: 0; color: #374151;">Regards,</p>
-                    <p style="margin: 5px 0 0 0; color: #dc2626; font-weight: 600;">Document Tracking System</p>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="email-footer">
-                <p>This is an automated notification from the Document Tracking System.</p>
-                <p>Please do not reply to this email.</p>
-                <p style="margin-top: 15px; font-size: 12px; color: #9ca3af;">
-                    &copy; {{ date('Y') }} Document Tracking System. All rights reserved.
-                </p>
             </div>
         </div>
     </div>
 </body>
 </html>
+
+

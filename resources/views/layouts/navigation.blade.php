@@ -18,7 +18,7 @@
                 </div>
 
                 <!-- Desktop Navigation Links -->
-                <div class="hidden sm:ms-4 sm:flex sm:items-center sm:gap-1 panel-surface-soft px-2 py-1.5">
+                <div class="hidden sm:ms-4 sm:flex sm:items-center sm:gap-1">
 
                     <x-nav-link
                         :href="route('incoming.index')"

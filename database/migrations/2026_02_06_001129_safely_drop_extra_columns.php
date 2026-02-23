@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 return new class extends Migration
 {
@@ -10,37 +12,41 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Get all foreign keys on the documents table
-        $foreignKeys = DB::select("
-            SELECT CONSTRAINT_NAME 
-            FROM information_schema.KEY_COLUMN_USAGE 
-            WHERE TABLE_SCHEMA = DATABASE() 
-            AND TABLE_NAME = 'documents' 
-            AND REFERENCED_TABLE_NAME IS NOT NULL
-            AND COLUMN_NAME IN ('received_by', 'rejected_by')
-        ");
-        
-        // Drop each foreign key found
-        foreach ($foreignKeys as $fk) {
-            DB::statement("ALTER TABLE documents DROP FOREIGN KEY `{$fk->CONSTRAINT_NAME}`");
+        if (!Schema::hasTable('documents')) {
+            return;
         }
-        
-        // Now drop the columns if they exist
-        $columns = ['received_at', 'received_by', 'rejected_at', 'rejected_by'];
-        foreach ($columns as $column) {
-            // Check if column exists
-            $exists = DB::select("
-                SELECT COLUMN_NAME 
-                FROM information_schema.COLUMNS 
-                WHERE TABLE_SCHEMA = DATABASE() 
-                AND TABLE_NAME = 'documents' 
-                AND COLUMN_NAME = '{$column}'
-            ");
-            
-            if (!empty($exists)) {
-                DB::statement("ALTER TABLE documents DROP COLUMN `{$column}`");
+
+        $driver = DB::getDriverName();
+        $dropColumns = [];
+
+        foreach (['received_at', 'received_by', 'rejected_at', 'rejected_by'] as $column) {
+            if (Schema::hasColumn('documents', $column)) {
+                $dropColumns[] = $column;
             }
         }
+
+        if (empty($dropColumns)) {
+            return;
+        }
+
+        if ($driver === 'mysql') {
+            $foreignKeys = DB::select("
+                SELECT CONSTRAINT_NAME
+                FROM information_schema.KEY_COLUMN_USAGE
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'documents'
+                AND REFERENCED_TABLE_NAME IS NOT NULL
+                AND COLUMN_NAME IN ('received_by', 'rejected_by')
+            ");
+
+            foreach ($foreignKeys as $fk) {
+                DB::statement("ALTER TABLE documents DROP FOREIGN KEY `{$fk->CONSTRAINT_NAME}`");
+            }
+        }
+
+        Schema::table('documents', function (Blueprint $table) use ($dropColumns): void {
+            $table->dropColumn($dropColumns);
+        });
     }
 
     /**
@@ -48,9 +54,23 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('ALTER TABLE documents ADD COLUMN received_at TIMESTAMP NULL');
-        DB::statement('ALTER TABLE documents ADD COLUMN received_by BIGINT UNSIGNED NULL');
-        DB::statement('ALTER TABLE documents ADD COLUMN rejected_at TIMESTAMP NULL');
-        DB::statement('ALTER TABLE documents ADD COLUMN rejected_by BIGINT UNSIGNED NULL');
+        if (!Schema::hasTable('documents')) {
+            return;
+        }
+
+        Schema::table('documents', function (Blueprint $table): void {
+            if (!Schema::hasColumn('documents', 'received_at')) {
+                $table->timestamp('received_at')->nullable();
+            }
+            if (!Schema::hasColumn('documents', 'received_by')) {
+                $table->unsignedBigInteger('received_by')->nullable();
+            }
+            if (!Schema::hasColumn('documents', 'rejected_at')) {
+                $table->timestamp('rejected_at')->nullable();
+            }
+            if (!Schema::hasColumn('documents', 'rejected_by')) {
+                $table->unsignedBigInteger('rejected_by')->nullable();
+            }
+        });
     }
 };

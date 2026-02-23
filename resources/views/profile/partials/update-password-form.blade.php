@@ -12,15 +12,15 @@
         this.hasNumber = /[0-9]/.test(this.password);
     }
 }">
-    <div class="flex justify-between items-start gap-8">
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
         <!-- Left Side: Header and Form -->
-        <div class="flex-1" style="max-width: 600px;">
+        <div class="w-full">
             <header>
-                <h2 class="text-lg font-medium text-gray-900">
+                <h2 class="text-lg font-semibold text-slate-900">
                     {{ __('Update Password') }}
                 </h2>
 
-                <p class="mt-1 text-sm text-gray-600">
+                <p class="mt-1 text-sm text-slate-600">
                     {{ __('Ensure your account is using a long, random password to stay secure.') }}
                 </p>
             </header>
@@ -31,7 +31,7 @@
 
                 <div>
                     <x-input-label for="update_password_current_password" :value="__('Current Password')" />
-                    <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" style="width: 100% !important; min-width: 400px;" autocomplete="current-password" />
+                    <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
                     <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
                 </div>
 
@@ -42,7 +42,6 @@
                         name="password" 
                         type="password" 
                         class="mt-1 block w-full" 
-                        style="width: 100% !important; min-width: 400px;"
                         autocomplete="new-password"
                         x-model="password"
                         @input="validatePassword()" />
@@ -51,7 +50,7 @@
 
                 <div>
                     <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-                    <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" style="width: 100% !important; min-width: 400px;" autocomplete="new-password" />
+                    <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
                     <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
                 </div>
 
@@ -72,9 +71,9 @@
         </div>
 
         <!-- Right Side: Password Requirements Box -->
-        <div class="flex flex-col items-center flex-shrink-0" style="min-width: 280px;">
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6" style="width: 320px;">
-                <h3 class="text-base font-semibold text-gray-700 mb-5">Password must contain:</h3>
+        <div class="flex w-full flex-col items-start lg:items-center">
+            <div class="w-full rounded-xl border border-slate-200 bg-slate-50 p-6 lg:max-w-[320px]">
+                <h3 class="mb-5 text-base font-semibold text-slate-700">Password must contain:</h3>
                 <div class="space-y-4">
                     <!-- At least 8 characters -->
                     <div class="flex items-center gap-3">
@@ -86,7 +85,7 @@
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                             </svg>
                         </div>
-                        <span class="text-base" :class="hasMinLength ? 'text-green-700 font-medium' : 'text-gray-600'">
+                        <span class="text-base" :class="hasMinLength ? 'text-green-700 font-medium' : 'text-slate-600'">
                             At least 8 characters
                         </span>
                     </div>
@@ -101,7 +100,7 @@
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                             </svg>
                         </div>
-                        <span class="text-base" :class="hasUppercase ? 'text-green-700 font-medium' : 'text-gray-600'">
+                        <span class="text-base" :class="hasUppercase ? 'text-green-700 font-medium' : 'text-slate-600'">
                             One uppercase letter
                         </span>
                     </div>
@@ -116,7 +115,7 @@
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                             </svg>
                         </div>
-                        <span class="text-base" :class="hasLowercase ? 'text-green-700 font-medium' : 'text-gray-600'">
+                        <span class="text-base" :class="hasLowercase ? 'text-green-700 font-medium' : 'text-slate-600'">
                             One lowercase letter
                         </span>
                     </div>
@@ -131,7 +130,7 @@
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                             </svg>
                         </div>
-                        <span class="text-base" :class="hasNumber ? 'text-green-700 font-medium' : 'text-gray-600'">
+                        <span class="text-base" :class="hasNumber ? 'text-green-700 font-medium' : 'text-slate-600'">
                             One number
                         </span>
                     </div>

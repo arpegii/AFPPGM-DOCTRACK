@@ -26,7 +26,6 @@ class EmailChangeVerification extends Notification
             'token' => $this->token,
             'email' => $this->newEmail,
         ]);
-
         return (new MailMessage)
             ->subject('Verify Your New Email Address')
             ->greeting('Hello ' . $notifiable->name . '!')
@@ -34,6 +33,7 @@ class EmailChangeVerification extends Notification
             ->line('Please click the button below to verify your new email address.')
             ->action('Verify Email Address', $url)
             ->line('This link will expire in 60 minutes.')
-            ->line('If you did not request this change, please ignore this email and your email address will remain unchanged.');
+            ->line('If you did not request this change, please ignore this email and your email address will remain unchanged.')
+            ->salutation('');
     }
 }
